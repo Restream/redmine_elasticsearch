@@ -1,0 +1,2 @@
+module RedmineElasticsearch
+end
