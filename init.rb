@@ -12,4 +12,5 @@ Redmine::Plugin.register :redmine_elasticsearch do
   url         'https://github.com/Undev/redmine_elasticsearch'
 
   requires_redmine :version_or_higher => '2.1'
+  requires_redmine_plugin :redmine_sidekiq, :version_or_higher => '0.0.1'
 end
