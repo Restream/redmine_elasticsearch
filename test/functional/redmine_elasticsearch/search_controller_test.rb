@@ -23,6 +23,9 @@ class RedmineElasticsearch::SearchControllerTest < ActionController::TestCase
     @project = Project.find(1)
     User.current = @user
     @request.session[:user_id] = 2
+    @issue = Issue.find(1)
+    @obj = TireMock.new(entity_name: :issue, entity: @issue)
+    @obj.perform_stub
   end
 
   def test_index_success
