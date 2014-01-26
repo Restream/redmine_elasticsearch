@@ -26,9 +26,6 @@ module RedmineElasticsearch::Patches::SearchControllerPatch
             @project
         end
 
-    offset = nil
-    begin; offset = params[:offset].to_time if params[:offset]; rescue; end
-
     # quick jump to an issue
     if (m = @question.match(/^#?(\d+)$/)) && (issue = Issue.visible.find_by_id(m[1].to_i))
       redirect_to issue_path(issue)
@@ -46,8 +43,11 @@ module RedmineElasticsearch::Patches::SearchControllerPatch
     @scope = @object_types.select {|t| params[t]}
     @scope = @object_types if @scope.empty?
 
-    search = Tire::Search::Search.new
-    search.query { |query| query.string(@question) }
+    index_names = tire_index_names(@object_types)
+    search = Tire::Search::Search.new(index_names)
+    search.query do |query|
+      query.string @question
+    end
     search.facet('types'){ terms :_type }
     @results = search.results
     @results_by_type = Hash.new {|h,k| h[k] = 0}
@@ -56,6 +56,12 @@ module RedmineElasticsearch::Patches::SearchControllerPatch
     end
 
     render :layout => false if request.xhr?
+  end
+
+  private
+
+  def tire_index_names(object_types)
+    object_types.map { |object_type| object_type.classify.constantize.index_name }
   end
 end
 
