@@ -1,0 +1,2 @@
+class NewsSerializer < EventSerializer
+end

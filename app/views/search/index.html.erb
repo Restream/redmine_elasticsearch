@@ -21,12 +21,12 @@
   <% end %>
 </div>
 
-<% if @results %>
+<% unless @results.empty? %>
   <div id="search-results-counts">
     <%= render_results_by_type(@results_by_type) unless @scope.size == 1 %>
   </div>
 
-  <h3><%= l(:label_result_plural) %> (<%= @results_by_type.values.sum %>)</h3>
+  <h3><%= l(:label_result_plural) %> (<%= @results.total_entries %>)</h3>
   <dl id="search-results">
     <% @results.each do |e| %>
       <dt class="<%= e.event_type %>"><%= content_tag('span', h(e.project), :class => 'project') unless @project == e.project %> <%= link_to highlight_tokens(truncate(e.event_title, :length => 255), @tokens), e.event_url %></dt>
@@ -34,19 +34,10 @@
         <span class="author"><%= format_time(e.event_datetime) %></span></dd>
     <% end %>
   </dl>
+
+  <%= page_entries_info @results %>
+  <%= paginate @results %>
 <% end %>
 
-<p><center>
-  <% if @pagination_previous_date %>
-    <%= link_to_content_update("\xc2\xab " + l(:label_previous),
-                               params.merge(:previous => 1,
-                                            :offset => @pagination_previous_date.strftime("%Y%m%d%H%M%S"))) %>&nbsp;
-  <% end %>
-  <% if @pagination_next_date %>
-    <%= link_to_content_update(l(:label_next) + " \xc2\xbb",
-                               params.merge(:previous => nil,
-                                            :offset => @pagination_next_date.strftime("%Y%m%d%H%M%S"))) %>
-  <% end %>
-</center></p>
 
 <% html_title(l(:label_search)) -%>

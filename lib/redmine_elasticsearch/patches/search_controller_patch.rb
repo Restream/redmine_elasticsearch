@@ -46,9 +46,14 @@ module RedmineElasticsearch::Patches::SearchControllerPatch
     @scope = @object_types.select {|t| params[t]}
     @scope = @object_types if @scope.empty?
 
-    @results = Issue.elastic(params).results
+    search = Tire::Search::Search.new
+    search.query { |query| query.string(@question) }
+    search.facet('types'){ terms :_type }
+    @results = search.results
     @results_by_type = Hash.new {|h,k| h[k] = 0}
-
+    search.results.facets['types']['terms'].each do |facet|
+      @results_by_type[facet['term']] = facet['count']
+    end
 
     render :layout => false if request.xhr?
   end
