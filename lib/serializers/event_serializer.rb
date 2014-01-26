@@ -10,10 +10,10 @@ class EventSerializer < ActiveModel::Serializer
   end
 
   def event_author
-    object.author.to_s
+    object.event_author.to_s
   end
 
   def event_url
-    url_for default_url_options.merge(object.event_url)
+    url_for object.event_url(default_url_options)
   end
 end
