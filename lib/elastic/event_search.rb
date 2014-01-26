@@ -1,10 +1,10 @@
-module IssueSearch
+module EventSearch
   extend ActiveSupport::Concern
   included do
     include ApplicationSearch
 
     def to_indexed_json
-      IssueSerializer.new(self).to_json
+      EventSerializer.new(self).to_json
     end
 
   end
@@ -16,14 +16,10 @@ module IssueSearch
     end
 
     def index_mapping
+      event_type = self.class.name.underscore.to_sym
       {
-          issue: { properties: issue_mapping_hash }
+          event_type => { properties: event_mapping_hash }
       }
     end
-
-    def issue_mapping_hash
-      event_mapping_hash
-    end
-
   end
 end

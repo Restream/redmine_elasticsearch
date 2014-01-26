@@ -1,2 +1,0 @@
-class NewsSerializer < EventSerializer
-end
