@@ -44,7 +44,7 @@ module RedmineElasticsearch::Patches::SearchControllerPatch
     @scope = @object_types if @scope.empty?
 
     index_names = tire_index_names(@object_types)
-    search = Tire::Search::Search.new(index_names)
+    search = Tire::Search::Search.new(index_names, :page => params[:page] || 1)
     search.query do |query|
       query.string @question
     end
