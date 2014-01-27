@@ -6,6 +6,8 @@ module RedmineElasticsearch::Patches::SearchControllerPatch
 
   included do
     alias_method_chain :index, :elasticsearch
+
+    RESULT_SIZE = 10
   end
 
   def index_with_elasticsearch
@@ -29,7 +31,8 @@ module RedmineElasticsearch::Patches::SearchControllerPatch
         :q => @question,
         :titles_only => @titles_only,
         :all_words => @all_words,
-        :page => params[:page] || 1
+        :page => params[:page] || 1,
+        :size => RESULT_SIZE
     )
     @results_by_type = get_results_by_type_from_search_results(@results)
 
@@ -74,8 +77,16 @@ module RedmineElasticsearch::Patches::SearchControllerPatch
 
   def perform_search(options = {})
     return [] if options[:q].blank?
+    size = options[:size]
+    page = options[:page].to_i
+    from = (page - 1) * size
     index_names = tire_index_names(options[:scope])
-    search = Tire::Search::Search.new(index_names, :page => options[:page])
+    search = Tire::Search::Search.new(
+        index_names,
+        :page => page,
+        :size => size,
+        :from => from
+    )
     search.query do |query|
       query.string options[:q]
     end
