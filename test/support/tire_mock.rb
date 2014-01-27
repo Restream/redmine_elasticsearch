@@ -25,21 +25,40 @@ class TireMock
 
   def tire_response_body_for_issue
     {
-        hits: {
-            total: 1,
-            max_score: 1,
-            hits: [
-                {
-                    _index: 'redmineapp_test_issues',
-                    _type: @entity.class.name,
-                    _id: @entity.id.to_s,
-                    _score: 1,
-                    _source: {
-                        id: @entity.id,
-                        subject: @entity.subject,
-                        description: @entity.description
-                    }
-                }]
+        'took' => 20,
+        'timed_out' => false,
+        '_shards' => {
+            'total' => 40,
+            'successful' => 40,
+            'failed' => 0
+        },
+        'hits' => {
+            'total' => 1,
+            'max_score' => 1,
+            'hits' => [{
+                           '_index' => @entity.index_name,
+                           '_type' => @entity_name,
+                           '_id' => @entity.id.to_s,
+                           '_score' => 1,
+                           '_source' => {
+                               'id' => @entity.id,
+                               'event_date' => @entity.event_date.to_s,
+                               'event_datetime' => @entity.event_datetime.to_s,
+                               'event_title' => @entity.event_title
+                           }
+                       }]
+        },
+        'facets' => {
+            'types' => {
+                '_type' => 'terms',
+                'missing' => 0,
+                'total' => 1,
+                'other' => 0,
+                'terms' => [{
+                                'term' => @entity_name,
+                                'count' => 1
+                            }]
+            }
         }
     }.to_json
   end
