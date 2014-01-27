@@ -28,6 +28,9 @@ module RedmineElasticsearch::Patches::SearchControllerPatch
       @results_by_type = get_results_by_type_from_search_results(@results)
       render :layout => false if request.xhr?
     end
+  rescue Tire::Search::SearchRequestFailed => e
+    logger.error e
+    render_error :message => :search_request_failed, :status => 503
   end
 
   private
