@@ -1,5 +1,8 @@
 # Full text searching plugin for Redmine
 
+[![Build Status](https://travis-ci.org/Undev/redmine_elasticsearch.png?branch=master)](https://travis-ci.org/Undev/redmine_elasticsearch)
+[![Code Climate](https://codeclimate.com/github/Undev/redmine_elasticsearch.png)](https://codeclimate.com/github/Undev/redmine_elasticsearch)
+
 This plugin integrates elasticsearch into Redmine
 
 ## Description
