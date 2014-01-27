@@ -11,35 +11,36 @@ module RedmineElasticsearch::Patches::SearchControllerPatch
   end
 
   def index_with_elasticsearch
+    get_variables_from_params
+
+    if issue = detect_issue_in_question(@question)
+      # quick jump to an issue
+      redirect_to issue_path(issue)
+    else
+      @results = perform_search(
+          :scope => @scope,
+          :q => @question,
+          :titles_only => @titles_only,
+          :all_words => @all_words,
+          :page => params[:page] || 1,
+          :size => RESULT_SIZE
+      )
+      @results_by_type = get_results_by_type_from_search_results(@results)
+      render :layout => false if request.xhr?
+    end
+  end
+
+  private
+
+  def get_variables_from_params
     @question = params[:q] || ''
     @question.strip!
     @all_words = params[:all_words] ? params[:all_words].present? : true
     @titles_only = params[:titles_only] ? params[:titles_only].present? : false
-
-    # quick jump to an issue
-    if issue = detect_issue_in_question(@question)
-      redirect_to issue_path(issue)
-      return
-    end
-
     projects_to_search = get_projects_from_params
     @object_types = allowed_object_types(projects_to_search)
     @scope = filter_object_types_from_params(@object_types)
-
-    @results = perform_search(
-        :scope => @scope,
-        :q => @question,
-        :titles_only => @titles_only,
-        :all_words => @all_words,
-        :page => params[:page] || 1,
-        :size => RESULT_SIZE
-    )
-    @results_by_type = get_results_by_type_from_search_results(@results)
-
-    render :layout => false if request.xhr?
   end
-
-  private
 
   def detect_issue_in_question(question)
     (m = question.match(/^#?(\d+)$/)) && Issue.visible.find_by_id(m[1].to_i)
