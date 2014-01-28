@@ -31,6 +31,9 @@ module RedmineElasticsearch::Patches::SearchControllerPatch
   rescue Tire::Search::SearchRequestFailed => e
     logger.error e
     render_error :message => :search_request_failed, :status => 503
+  rescue Errno::ECONNREFUSED => e
+    logger.error e
+    render_error :message => :search_connection_refused, :status => 503
   end
 
   private
@@ -66,9 +69,9 @@ module RedmineElasticsearch::Patches::SearchControllerPatch
     object_types = Redmine::Search.available_search_types.dup
     if projects_to_search.is_a? Project
       # don't search projects
-      @object_types.delete('projects')
+      object_types.delete('projects')
       # only show what the user is allowed to view
-      @object_types = @object_types.select { |o| User.current.allowed_to?("view_#{o}".to_sym, projects_to_search) }
+      object_types = object_types.select { |o| User.current.allowed_to?("view_#{o}".to_sym, projects_to_search) }
     end
     object_types
   end
