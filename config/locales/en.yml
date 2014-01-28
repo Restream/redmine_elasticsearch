@@ -1,2 +1,3 @@
 en:
   search_request_failed: Search request to full text search engine failed.
+  search_connection_refused: Connection to full text search engine refused.
