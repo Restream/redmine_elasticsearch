@@ -2,6 +2,7 @@ language: ruby
 
 services:
   - postgresql
+  - redis-server
 
 rvm:
   - 1.9.3
@@ -19,10 +20,10 @@ env:
 matrix:
   exclude:
     - rvm: 2.0.0
-      env: REDMINE_VER=2.1.6
+      env: REDMINE_VER=2.1.6 DB=postgresql
       gemfile: $REDMINE_PATH/Gemfile
     - rvm: 2.0.0
-      env: REDMINE_VER=2.2.4
+      env: REDMINE_VER=2.2.4 DB=postgresql
       gemfile: $REDMINE_PATH/Gemfile
 
 before_install:
@@ -32,6 +33,7 @@ before_install:
   - ln -s $TRAVIS_BUILD_DIR $REDMINE_PATH/plugins/$PLUGIN_NAME
   - cp config/database-$DB-travis.yml $REDMINE_PATH/config/database.yml
   - git clone --depth=1 https://github.com/Undev/redmine_sidekiq.git $REDMINE_PATH/plugins/redmine_sidekiq
+  - echo "gem 'iconv'" >> $REDMINE_PATH/Gemfile
   - cd $REDMINE_PATH
 
 before_script:
