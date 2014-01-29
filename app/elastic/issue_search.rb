@@ -22,7 +22,19 @@ module IssueSearch
     end
 
     def issue_mapping_hash
-      event_mapping_hash
+      event_mapping_hash.merge(
+          journals: {
+              properties: {
+                  id: { type: 'integer', index: 'not_analyzed' },
+                  event_date: { type: 'date' },
+                  event_datetime: { type: 'date' },
+                  event_title: { type: 'string' },
+                  event_description: { type: 'string' },
+                  event_author: { type: 'string' },
+                  event_type: { type: 'string' }
+              }
+          }
+      )
     end
 
   end

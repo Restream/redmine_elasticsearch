@@ -1,3 +1,3 @@
 class IssueSerializer < EventSerializer
-  #has_many :notes, serializer: JournalNotesSerializer
+  has_many :journals, serializer: EventSerializer
 end
