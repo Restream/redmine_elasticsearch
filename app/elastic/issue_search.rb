@@ -1,11 +1,8 @@
 module IssueSearch
   extend ActiveSupport::Concern
+
   included do
     include ApplicationSearch
-  end
-
-  def to_indexed_json
-    IssueSerializer.new(self).to_json
   end
 
   module ClassMethods
@@ -56,9 +53,13 @@ module IssueSearch
         if table_name = table_and_column.split('.')[-2]
           table = table_name.to_sym
           assoc = self.class.reflect_on_association(table)
-          if assoc.macro == :has_many
-            hsh[table] ||= { :properties => {} }
-            hsh[table][:properties][column] = { :type => 'string' }
+          case assoc.macro
+            when :has_many
+              hsh[table] ||= { :properties => {} }
+              hsh[table][:properties][column] = { :type => 'string' }
+            when :has_one, :belongs_to
+              hsh[table] ||= { }
+              hsh[table][column] = { :type => 'string' }
           end
         else
           hsh[column] = { :type => 'string' }

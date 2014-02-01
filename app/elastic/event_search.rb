@@ -1,12 +1,8 @@
 module EventSearch
   extend ActiveSupport::Concern
+
   included do
     include ApplicationSearch
-
-    def to_indexed_json
-      EventSerializer.new(self).to_json
-    end
-
   end
 
   module ClassMethods

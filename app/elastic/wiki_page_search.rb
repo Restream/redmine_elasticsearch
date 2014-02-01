@@ -1,12 +1,8 @@
 module WikiPageSearch
   extend ActiveSupport::Concern
+
   included do
     include ApplicationSearch
-
-    def to_indexed_json
-      WikiPageSerializer.new(self).to_json
-    end
-
   end
 
   module ClassMethods

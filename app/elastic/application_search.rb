@@ -1,5 +1,6 @@
 module ApplicationSearch
   extend ActiveSupport::Concern
+
   included do
     include Tire::Model::Search
 
@@ -7,6 +8,10 @@ module ApplicationSearch
     Tire::Model::Search.index_prefix(prefix)
 
     after_commit :async_update_index
+  end
+
+  def to_indexed_json
+    RedmineElasticsearch::SerializerFactory.serializer(self).to_json
   end
 
   def async_update_index
