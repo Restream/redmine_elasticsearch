@@ -16,8 +16,8 @@ class RedmineElasticsearch::SerializerService
     def build_serializer_klass(object_type)
       parent = "#{object_type.to_s.classify}Serializer".safe_constantize || BaseSerializer
       serializer_klass = Class.new(parent)
-      object_type_schema = RedmineElasticsearch::SchemaRepository.find(object_type)
-      serializer_klass.apply_schema(object_type_schema)
+      object_type_schema = SearchIndex.find_by_search_type(object_type)
+      serializer_klass.apply_schema(object_type_schema) if object_type_schema
     end
 
   end
