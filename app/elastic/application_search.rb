@@ -11,7 +11,7 @@ module ApplicationSearch
   end
 
   def to_indexed_json
-    RedmineElasticsearch::SerializerFactory.serializer(self).to_json
+    RedmineElasticsearch::SerializerService.serialize_to_json(self)
   end
 
   def async_update_index
@@ -20,20 +20,49 @@ module ApplicationSearch
 
   module ClassMethods
 
-    def recreate_index(klass = self, sync = true)
-      klass.index.delete if klass.index.exists?
-      klass.index.create settings: index_settings, mappings: index_mapping
-      sync ? sync_update_index(klass) : async_update_index(klass)
+    def recreate_index(sync = true)
+      tire.index.delete if tire.index.exists?
+      tire.index.create settings: index_settings, mappings: index_mappings
+      sync ? update_index : async_update_index
     end
 
-    def sync_update_index(klass)
-      klass.find_each{ |instance| instance.update_index }
+    def index_settings
+      {
+          analysis: {
+              :analyzer => {
+                  :index_analyzer => {
+                      type: 'custom',
+                      tokenizer: 'standard',
+                      filter: %w(lowercase asciifolding russian_morphology english_morphology)
+                  },
+                  :search_analyzer => {
+                      type: 'custom',
+                      tokenizer: 'standard',
+                      filter: %w(lowercase asciifolding russian_morphology english_morphology)
+                  }
+              }
+          }
+      }
     end
 
-    def async_update_index(klass)
-      klass.find_each{ |instance| Workers::Indexer.defer(instance) }
+    def index_mappings
+      { }
     end
 
+    def update_index
+      searching_scope.find_in_batches do |batch|
+        logger.info "Updating index for #{self.name} (#{batch.length} items)"
+        tire.index.import batch
+      end
+    end
+
+    def async_update_index
+      Workers::Indexer.defer(self)
+    end
+
+    def searching_scope
+      self.scoped.includes(searchable_options[:include])
+    end
   end
 
 end
