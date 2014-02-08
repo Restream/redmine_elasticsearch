@@ -1,73 +1,47 @@
 module IssueSearch
   extend ActiveSupport::Concern
 
-  included do
-    include ApplicationSearch
-  end
-
   module ClassMethods
 
-    def index_settings
-      {}
+    def searching_scope
+      self.scoped.includes(
+          [:status, :project, :tracker, :author, :assigned_to, :category, :status]
+      )
     end
 
-    def index_mapping
+    def index_mappings
       {
-          issue: { properties: issue_mapping_hash }
+          issue: { properties: issue_mappings_hash }
       }
     end
 
-    def issue_mapping_hash
+    def issue_mappings_hash
       {
           id: { type: 'integer' },
-          event_date: { type: 'date' },
-          event_datetime: { type: 'date' },
-          event_title: { type: 'string' },
-          event_description: { type: 'string' },
-          event_author: { type: 'string' },
-          event_type: { type: 'string' },
+          project_id: { type: 'integer', index: 'not_analyzed' },
+
+          subject: { type: 'string' },
+          description: { type: 'string' },
+
+          created_on: { type: 'date' },
+          updated_on: { type: 'date' },
+          closed_on: { type: 'date' },
+
+          author: { type: 'string' },
+          assigned_to: { type: 'string' },
+
+          category: { type: 'string' },
+          status: { type: 'string' },
+          done_ratio: { type: 'string', index: 'not_analyzed' },
 
           journals: {
               properties: {
                   id: { type: 'integer', index: 'not_analyzed' },
-                  event_datetime: { type: 'date' },
-                  event_description: { type: 'string' },
-                  event_author: { type: 'string' }
+                  notes: { type: 'string' }
               }
           }
-      }
+      }.merge(additional_index_mappings)
     end
-
-    protected
-
-    # search columns added by other plugins
-    def additional_search_columns
-      searchable_options[:columns] -
-          ['subject', "#{Issue.table_name}.description", "#{Journal.table_name}.notes"]
-    end
-
-    def additional_mapping_hash
-      hsh = {}
-      additional_search_columns.each do |table_and_column|
-        column = table_and_column.split('.')[-1].to_sym
-        if table_name = table_and_column.split('.')[-2]
-          table = table_name.to_sym
-          assoc = self.class.reflect_on_association(table)
-          case assoc.macro
-            when :has_many
-              hsh[table] ||= { :properties => {} }
-              hsh[table][:properties][column] = { :type => 'string' }
-            when :has_one, :belongs_to
-              hsh[table] ||= { }
-              hsh[table][column] = { :type => 'string' }
-          end
-        else
-          hsh[column] = { :type => 'string' }
-        end
-      end
-      hsh
-    end
-
 
   end
 end
