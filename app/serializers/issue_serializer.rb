@@ -1,9 +1,28 @@
 class IssueSerializer < BaseSerializer
-  has_many :journals, serializer: BaseSerializer
+  attributes :project_id,
+             :subject, :description,
+             :created_on, :updated_on, :closed_on,
+             :author,
+             :assigned_to,
+             :category,
+             :status,
+             :done_ratio
 
-  # override additional_search_columns to remove already indexed issue attributes
-  def additional_search_columns
-    object.class.searchable_options[:columns] -
-        ['subject', "#{Issue.table_name}.description", "#{Journal.table_name}.notes"]
+  has_many :journals, :serializer => JournalSerializer
+
+  def author
+    object.author.try(:name)
+  end
+
+  def assigned_to
+    object.assigned_to.try(:name)
+  end
+
+  def category
+    object.category.try(:name)
+  end
+
+  def status
+    object.status.try(:name)
   end
 end
