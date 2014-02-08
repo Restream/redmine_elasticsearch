@@ -51,7 +51,7 @@ module ApplicationSearch
 
     def additional_index_mappings
       return {} unless Rails.configuration.respond_to?(:additional_index_properties)
-      Rails.configuration.additional_index_properties[self.class.name.tableize.to_sym]
+      Rails.configuration.additional_index_properties[self.name.tableize.to_sym]
     end
 
     def update_index
