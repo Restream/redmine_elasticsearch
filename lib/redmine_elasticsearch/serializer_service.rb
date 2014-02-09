@@ -36,7 +36,7 @@ class RedmineElasticsearch::SerializerService
         if nested_props.nil?
           add_attribute_to_serializer(serializer_klass, key)
         else
-          add_association_to_serializer(serializer_klass, key, value)
+          add_association_to_serializer(serializer_klass, key, nested_props)
         end
       end
     end
