@@ -9,6 +9,23 @@ This plugin integrates elasticsearch into Redmine
 
 todo
 
+You can add additional index options to config/additional_environment.rb.
+For example:
+
+    config.additional_index_properties = {
+        :issues => {
+            :issue_tags => {
+                :properties => {
+                    :name => { :type => 'string' }
+                }
+            },
+            :tags => { :type => 'string' }
+
+        }
+    }
+
+All this options will be joined to index settings.
+
 ## Install
 
 1. Copy plugin directory into REDMINE_ROOT/plugins.

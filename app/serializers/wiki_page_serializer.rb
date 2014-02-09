@@ -1,5 +1,9 @@
 class WikiPageSerializer < BaseSerializer
-  def event_author
-    nil
+  attributes :project_id,
+             :title, :text,
+             :created_on, :updated_on
+
+  def project_id
+    object.wiki.try(:project_id)
   end
 end

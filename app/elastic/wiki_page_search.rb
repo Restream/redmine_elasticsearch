@@ -1,31 +1,26 @@
 module WikiPageSearch
   extend ActiveSupport::Concern
 
-  included do
-    include ApplicationSearch
-  end
-
   module ClassMethods
 
-    def index_settings
-      {}
-    end
-
-    def index_mapping
+    def index_mappings
       {
-          wiki_page: { properties: wiki_page_mapping_hash }
+          wiki_page: { properties: wiki_page_mappings_hash }
       }
     end
 
-    def wiki_page_mapping_hash
+    def wiki_page_mappings_hash
       {
           id: { type: 'integer' },
-          event_date: { type: 'date' },
-          event_datetime: { type: 'date' },
-          event_title: { type: 'string' },
-          event_description: { type: 'string' },
-          event_type: { type: 'string' }
-      }
+          project_id: { type: 'integer', index: 'not_analyzed' },
+
+          title: { type: 'string' },
+          text: { type: 'string' },
+
+          created_on: { type: 'date' },
+          updated_on: { type: 'date' }
+
+      }.merge(additional_index_mappings)
     end
 
   end
