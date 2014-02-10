@@ -92,7 +92,8 @@ module RedmineElasticsearch::Patches::SearchControllerPatch
         index_names,
         :page => page,
         :size => size,
-        :from => from
+        :from => from,
+        :load => true
     )
     search.query do |query|
       query.string options[:q]

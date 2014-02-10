@@ -13,8 +13,6 @@ Redmine::Plugin.register :redmine_elasticsearch do
 
   requires_redmine :version_or_higher => '2.1'
 
-  Redmine::Search.register :journals
-
   # plugins loaded in alphabetical order, so redmine_sidekiq will be load later
   # requires_redmine_plugin :redmine_sidekiq, :version_or_higher => '0.0.1'
 end
