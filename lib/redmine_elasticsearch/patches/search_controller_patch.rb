@@ -23,7 +23,8 @@ module RedmineElasticsearch::Patches::SearchControllerPatch
           :titles_only => @titles_only,
           :all_words => @all_words,
           :page => params[:page] || 1,
-          :size => RESULT_SIZE
+          :size => RESULT_SIZE,
+          :projects => @projects_to_search
       )
       @results_by_type = get_results_by_type_from_search_results(@results)
       render :layout => false if request.xhr?
@@ -43,8 +44,8 @@ module RedmineElasticsearch::Patches::SearchControllerPatch
     @question.strip!
     @all_words = params[:all_words] ? params[:all_words].present? : true
     @titles_only = params[:titles_only] ? params[:titles_only].present? : false
-    projects_to_search = get_projects_from_params
-    @object_types = allowed_object_types(projects_to_search)
+    @projects_to_search = get_projects_from_params
+    @object_types = allowed_object_types(@projects_to_search)
     @scope = filter_object_types_from_params(@object_types)
   end
 
@@ -84,21 +85,23 @@ module RedmineElasticsearch::Patches::SearchControllerPatch
 
   def perform_search(options = {})
     return [] if options[:q].blank?
-    size = options[:size]
-    page = options[:page].to_i
-    from = (page - 1) * size
     index_names = tire_index_names(options[:scope])
-    search = Tire::Search::Search.new(
-        index_names,
-        :page => page,
-        :size => size,
-        :from => from,
+    search_options = {
+        :page => options[:page].to_i,
+        :size => options[:size].to_i,
+        :from => (options[:page].to_i - 1) * options[:size].to_i,
         :load => true
-    )
-    search.query do |query|
-      query.string options[:q]
+    }
+    project_ids = [options[:projects]].flatten.compact.map(&:id)
+    search = Tire::Search::Search.new(index_names, search_options) do
+      query do
+        filtered do
+          query { string options[:q] }
+          filter :terms, :project_id => project_ids unless project_ids.empty?
+        end
+      end
+      facet('types') { terms :_type }
     end
-    search.facet('types') { terms :_type }
     search.results
   end
 
