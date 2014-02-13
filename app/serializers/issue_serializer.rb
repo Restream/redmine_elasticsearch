@@ -6,7 +6,8 @@ class IssueSerializer < BaseSerializer
              :assigned_to,
              :category,
              :status,
-             :done_ratio
+             :done_ratio,
+             :custom_field_values
 
   has_many :journals, :serializer => JournalSerializer
 
@@ -24,5 +25,9 @@ class IssueSerializer < BaseSerializer
 
   def status
     object.status.try(:name)
+  end
+
+  def custom_field_values
+    object.custom_field_values.map(&:to_s)
   end
 end

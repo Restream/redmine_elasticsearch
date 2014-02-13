@@ -34,6 +34,8 @@ module IssueSearch
           status: { type: 'string' },
           done_ratio: { type: 'string', index: 'not_analyzed' },
 
+          custom_field_values: { type: 'string', index_name: 'cfv' },
+
           journals: {
               properties: {
                   id: { type: 'integer', index: 'not_analyzed' },

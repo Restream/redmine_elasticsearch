@@ -21,7 +21,9 @@ module ProjectSearch
           created_on: { type: 'date' },
           updated_on: { type: 'date' },
 
-          is_public: { type: 'boolean' }
+          is_public: { type: 'boolean' },
+
+          custom_field_values: { type: 'string', index_name: 'cfv' }
 
       }.merge(additional_index_mappings)
     end
