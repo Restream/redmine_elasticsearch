@@ -28,6 +28,7 @@ class IssueSerializer < BaseSerializer
   end
 
   def custom_field_values
-    object.custom_field_values.map(&:to_s)
+    fields = object.custom_field_values.find_all { |cfv| cfv.custom_field.searchable? }
+    fields.map(&:to_s)
   end
 end
