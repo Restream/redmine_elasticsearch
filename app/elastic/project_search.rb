@@ -54,7 +54,7 @@ module ProjectSearch
 
       project_ids &= options[:project_ids] if options[:project_ids]
 
-      base_statement = "project_id:(#{project_ids.sort.join(' ')})"
+      base_statement = "project_id:(#{project_ids.join(' ')})"
 
       if user.admin?
         base_statement
@@ -63,12 +63,12 @@ module ProjectSearch
         role = user.logged? ? Role.non_member : Role.anonymous
         if role.allowed_to?(permission)
           public_ids = Project.all_public.map(&:id)
-          statement_by_role[role] = "project_id:(#{public_ids.sort.join(' ')})"
+          statement_by_role[role] = "project_id:(#{public_ids.join(' ')})"
         end
         if user.logged?
           user.projects_by_role.each do |role, projects|
             if role.allowed_to?(permission) && projects.any?
-              statement_by_role[role] = "project_id:(#{projects.collect(&:id).sort.join(' ')})"
+              statement_by_role[role] = "project_id:(#{projects.collect(&:id).join(' ')})"
             end
           end
         end
