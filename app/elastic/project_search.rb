@@ -43,8 +43,8 @@ module ProjectSearch
       Project.where('status <> ?', Project::STATUS_ARCHIVED).pluck(:id)
     end
 
-    def allowed_to_search_query(user, permission, options={})
-
+    def allowed_to_search_query(user, options = {})
+      permission = options[:permission] || :search_project
       perm = Redmine::AccessControl.permission(permission)
 
       project_ids = ids_not_archived
@@ -53,6 +53,8 @@ module ProjectSearch
       project_ids &= ids_with_enabled_module(perm.project_module) if perm && perm.project_module
 
       project_ids &= options[:project_ids] if options[:project_ids]
+
+      return 'project_id:0' if project_ids.empty?
 
       base_statement = "project_id:(#{project_ids.join(' ')})"
 
@@ -77,9 +79,7 @@ module ProjectSearch
         else
           if block_given?
             statement_by_role.each do |role, statement|
-              if s = yield(role, user)
-                statement_by_role[role] = "(#{statement} AND #{s})"
-              end
+              statement_by_role[role] = "(#{statement} AND #{s})" if (s = yield(role, user))
             end
           end
           "#{base_statement} AND (#{statement_by_role.values.join(' OR ')})"
