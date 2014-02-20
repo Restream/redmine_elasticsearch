@@ -1,6 +1,12 @@
 require File.expand_path('../../../test_helper', __FILE__)
 
-class RedmineElasticsearch::ProjectSearchTest < ActiveSupport::TestCase
+class Project
+  def self.index_settings
+    { index: { store: { type: :memory } } }
+  end
+end
+
+class RedmineElasticsearch::ProjectSearchTest < ActionController::IntegrationTest
   fixtures :projects,
            :users,
            :roles,
@@ -18,7 +24,6 @@ class RedmineElasticsearch::ProjectSearchTest < ActiveSupport::TestCase
   def setup
     Project.recreate_index
     Project.index.refresh
-    sleep(1)
   end
 
   def test_allowed_to_search_query_for_users
