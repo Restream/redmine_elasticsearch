@@ -34,4 +34,8 @@ class IssueSerializer < BaseSerializer
     fields = object.custom_field_values.find_all { |cfv| cfv.custom_field.searchable? }
     fields.map(&:to_s)
   end
+
+  def closed_on
+    Redmine::VERSION.to_s >= '2.3.0' ? object.closed_on : nil
+  end
 end
