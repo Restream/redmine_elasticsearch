@@ -119,8 +119,6 @@ module RedmineElasticsearch::Patches::SearchControllerPatch
       end
       facet('types') { terms :_type }
     end
-    logger.debug search.to_curl
-    logger.debug search.to_hash
     search.results
   end
 

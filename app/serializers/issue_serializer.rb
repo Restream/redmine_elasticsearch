@@ -3,11 +3,14 @@ class IssueSerializer < BaseSerializer
              :subject, :description,
              :created_on, :updated_on, :closed_on,
              :author,
+             :author_id,
              :assigned_to,
+             :assigned_to_id,
              :category,
              :status,
              :done_ratio,
-             :custom_field_values
+             :custom_field_values,
+             :is_private
 
   has_many :journals, :serializer => JournalSerializer
 

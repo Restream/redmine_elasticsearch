@@ -28,13 +28,18 @@ module IssueSearch
           closed_on: { type: 'date' },
 
           author: { type: 'string' },
+          author_id: { type: 'integer', index: 'not_analyzed' },
+
           assigned_to: { type: 'string' },
+          assigned_to_id: { type: 'integer', index: 'not_analyzed' },
 
           category: { type: 'string' },
           status: { type: 'string' },
-          done_ratio: { type: 'string', index: 'not_analyzed' },
+          done_ratio: { type: 'integer' },
 
           custom_field_values: { type: 'string', index_name: 'cfv' },
+
+          is_private: { type: 'boolean' },
 
           journals: {
               properties: {
@@ -45,5 +50,26 @@ module IssueSearch
       }.merge(additional_index_mappings)
     end
 
+    def allowed_to_search_query(user, options = {})
+      options[:permission] = :view_issues
+      Project.allowed_to_search_query(user, options) do |role, user|
+        if user.logged?
+          case role.issues_visibility
+            when 'all'
+              nil
+            when 'default'
+              user_ids = [user.id] + user.groups.map(&:id)
+              "(is_private:false OR author_id:#{user.id} OR assigned_to_id:(#{user_ids.join(' ')}))"
+            when 'own'
+              user_ids = [user.id] + user.groups.map(&:id)
+              "(author_id:#{user.id} OR assigned_to_id:(#{user_ids.join(' ')}))"
+            else
+              'id:0'
+          end
+        else
+          'is_private:false'
+        end
+      end
+    end
   end
 end
