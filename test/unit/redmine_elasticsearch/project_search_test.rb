@@ -18,6 +18,7 @@ class RedmineElasticsearch::ProjectSearchTest < ActiveSupport::TestCase
   def setup
     Project.recreate_index
     Project.index.refresh
+    Thread.current.sleep(1)
   end
 
   def test_allowed_to_search_query_for_users
