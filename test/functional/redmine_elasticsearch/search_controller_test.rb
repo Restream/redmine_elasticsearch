@@ -13,9 +13,7 @@ class RedmineElasticsearch::SearchControllerTest < ActionController::TestCase
            :projects_trackers,
            :issue_categories,
            :enabled_modules,
-           :enumerations,
-           :news,
-           :documents
+           :enumerations
 
   def setup
     @controller = SearchController.new

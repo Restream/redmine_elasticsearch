@@ -30,6 +30,8 @@ class RedmineElasticsearch::SerializerServiceTest < ActiveSupport::TestCase
     serializer = RedmineElasticsearch::SerializerService.serializer(issue)
     assert serializer.respond_to?(:foo)
     assert serializer.respond_to?(:bar)
+  ensure
+    Rails.configuration.stubs(:additional_index_properties).returns({})
   end
 
   def test_get_implicit_serializer
