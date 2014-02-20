@@ -3,6 +3,7 @@ language: ruby
 services:
   - postgresql
   - redis-server
+  - elasticsearch
 
 rvm:
   - 1.9.3

@@ -11,7 +11,7 @@ module ProjectSearch
 
     def project_mappings_hash
       {
-          id: { type: 'integer' },
+          id: { type: 'integer', index_name: 'project_id' },
 
           name: { type: 'string' },
           description: { type: 'string' },
@@ -79,7 +79,8 @@ module ProjectSearch
         else
           if block_given?
             statement_by_role.each do |role, statement|
-              statement_by_role[role] = "(#{statement} AND #{s})" if (s = yield(role, user))
+              block_statement = yield(role, user)
+              statement_by_role[role] = "(#{statement} AND #{block_statement})" if block_statement.present?
             end
           end
           "#{base_statement} AND (#{statement_by_role.values.join(' OR ')})"
