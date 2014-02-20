@@ -92,16 +92,35 @@ module RedmineElasticsearch::Patches::SearchControllerPatch
         :from => (options[:page].to_i - 1) * options[:size].to_i,
         :load => true
     }
-    project_ids = [options[:projects]].flatten.compact.map(&:id)
+    project_ids = options[:projects] ? [options[:projects]].flatten.compact.map(&:id) : nil
+    queries_by_object_types = []
+    @object_types.each do |search_type|
+      search_klass = search_type.to_s.classify.constantize
+      queries_by_object_types << if search_klass.respond_to?(:allowed_to_search_query)
+        q = search_klass.allowed_to_search_query(User.current,
+                                                 :project_ids => project_ids)
+        "_type:#{search_type} AND (#{q})"
+      else
+        "_type:#{search_type}"
+      end
+    end
     search = Tire::Search::Search.new(index_names, search_options) do
       query do
         filtered do
-          query { string options[:q] }
-          filter :terms, :project_id => project_ids unless project_ids.empty?
+          query do
+            boolean do
+              must { string options[:q] }
+              queries_by_object_types.each do |filter_by_object_type|
+                should { string filter_by_object_type }
+              end
+            end
+          end
         end
       end
       facet('types') { terms :_type }
     end
+    logger.debug search.to_curl
+    logger.debug search.to_hash
     search.results
   end
 
