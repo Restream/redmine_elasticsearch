@@ -22,5 +22,9 @@ module ChangesetSearch
       }.merge(additional_index_mappings)
     end
 
+    def allowed_to_search_query(user, options = {})
+      options[:permission] = :view_changesets
+      Project.allowed_to_search_query(user, options)
+    end
   end
 end

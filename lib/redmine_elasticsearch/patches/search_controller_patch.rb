@@ -96,19 +96,20 @@ module RedmineElasticsearch::Patches::SearchControllerPatch
     queries_by_object_types = []
     @object_types.each do |search_type|
       search_klass = search_type.to_s.classify.constantize
+      document_type = search_klass.index.get_type_from_document(search_klass)
       queries_by_object_types << if search_klass.respond_to?(:allowed_to_search_query)
         q = search_klass.allowed_to_search_query(User.current,
                                                  :project_ids => project_ids)
-        "_type:#{search_type} AND (#{q})"
+        "_type:#{document_type} AND (#{q})"
       else
-        "_type:#{search_type}"
+        "_type:#{document_type}"
       end
     end
     search = Tire::Search::Search.new(index_names, search_options) do
       query do
         filtered do
           query do
-            boolean do
+            boolean(minimum_should_match: 1) do
               must { string options[:q] }
               queries_by_object_types.each do |filter_by_object_type|
                 should { string filter_by_object_type }
@@ -119,6 +120,7 @@ module RedmineElasticsearch::Patches::SearchControllerPatch
       end
       facet('types') { terms :_type }
     end
+    @query_curl = search.to_curl
     search.results
   end
 
