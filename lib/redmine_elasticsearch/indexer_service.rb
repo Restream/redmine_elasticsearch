@@ -18,7 +18,7 @@ class RedmineElasticsearch::IndexerService
 
     def search_klasses
       #Redmine::Search.available_search_types.map { |type| type.to_s.classify.constantize }
-      [Project]
+      [Project, News]
     end
   end
 end
