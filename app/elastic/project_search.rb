@@ -5,31 +5,31 @@ module ProjectSearch
 
     def index_mappings
       {
-          project: { properties: project_mappings_hash }
+          project: {
+              _parent: { type: 'parent_project' },
+              _routing: { required: true, path: 'route_key' },
+              properties: project_mappings_hash
+          }
       }
     end
 
     def project_mappings_hash
       {
-          id: { type: 'integer', index_name: 'project_id' },
-
-          name: { type: 'string' },
-          description: { type: 'string' },
+          id: { type: 'integer', index_name: 'project_id', not_analyzed: true },
+          name: { type: 'string', analyzer: 'index_analyzer' },
+          description: { type: 'string', analyzer: 'index_analyzer' },
           homepage: { type: 'string' },
           identifier: { type: 'string' },
-
           created_on: { type: 'date' },
           updated_on: { type: 'date' },
-
+          custom_field_values: { type: 'string', index_name: 'cfv' },
           is_public: { type: 'boolean' },
-
-          custom_field_values: { type: 'string', index_name: 'cfv' }
-
+          route_key: { type: 'string', not_analyzed: true }
       }.merge(additional_index_mappings)
     end
 
-    def searching_scope
-      self.active
+    def searching_scope(project_id)
+      self.where("#{Project.table_name}.id = ?", project_id).includes(searchable_options[:include])
     end
 
     def ids_with_enabled_module(module_name)
