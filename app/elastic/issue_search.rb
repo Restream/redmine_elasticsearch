@@ -3,15 +3,13 @@ module IssueSearch
 
   module ClassMethods
 
-    def searching_scope
-      self.scoped.includes(
-          [:status, :project, :tracker, :author, :assigned_to, :category, :status]
-      )
-    end
-
     def index_mappings
       {
-          issue: { properties: issue_mappings_hash }
+          issue: {
+              _parent: { type: 'parent_project' },
+              _routing: { required: true, path: 'route_key' },
+              properties: issue_mappings_hash
+          }
       }
     end
 
@@ -46,7 +44,8 @@ module IssueSearch
                   id: { type: 'integer', index: 'not_analyzed' },
                   notes: { type: 'string' }
               }
-          }
+          },
+          route_key: { type: 'string', not_analyzed: true }
       }.merge(additional_index_mappings)
     end
 
