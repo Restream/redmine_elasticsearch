@@ -1,4 +1,4 @@
-class WikiPageSerializer < BaseSerializer
+class WikiPageSerializer < BaseChildSerializer
   attributes :project_id,
              :title, :text,
              :created_on, :updated_on
