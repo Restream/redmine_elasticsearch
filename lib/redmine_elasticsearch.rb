@@ -1,4 +1,5 @@
 module RedmineElasticsearch
+  INDEX_NAME = "#{Rails.application.class.parent_name.downcase}_#{Rails.env}"
 end
 
 %w{elastic serializers}.each do |fold|
