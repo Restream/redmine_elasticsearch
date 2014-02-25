@@ -20,6 +20,7 @@ module ChangesetSearch
           revision: { type: 'string', index: 'not_analyzed' },
           committer: { type: 'string' },
           committed_on: { type: 'date' },
+          comments: { type: 'string' },
           route_key: { type: 'string', not_analyzed: true }
       }.merge(additional_index_mappings)
     end
