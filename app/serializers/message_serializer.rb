@@ -1,4 +1,4 @@
-class MessageSerializer < BaseSerializer
+class MessageSerializer < BaseChildSerializer
   attributes :project_id,
              :subject, :content,
              :author,
