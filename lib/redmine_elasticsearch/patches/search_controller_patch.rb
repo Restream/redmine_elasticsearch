@@ -29,12 +29,12 @@ module RedmineElasticsearch::Patches::SearchControllerPatch
       @results_by_type = get_results_by_type_from_search_results(@results)
       render :layout => false if request.xhr?
     end
-  rescue Tire::Search::SearchRequestFailed => e
-    logger.error e
-    render_error :message => :search_request_failed, :status => 503
-  rescue Errno::ECONNREFUSED => e
-    logger.error e
-    render_error :message => :search_connection_refused, :status => 503
+  #rescue Tire::Search::SearchRequestFailed => e
+  #  logger.error e
+  #  render_error :message => :search_request_failed, :status => 503
+  #rescue Errno::ECONNREFUSED => e
+  #  logger.error e
+  #  render_error :message => :search_connection_refused, :status => 503
   end
 
   private
@@ -85,41 +85,73 @@ module RedmineElasticsearch::Patches::SearchControllerPatch
 
   def perform_search(options = {})
     return [] if options[:q].blank?
-    index_names = tire_index_names(options[:scope])
-    search_options = {
-        :page => options[:page].to_i,
-        :size => options[:size].to_i,
-        :from => (options[:page].to_i - 1) * options[:size].to_i,
-        :load => true
-    }
     project_ids = options[:projects] ? [options[:projects]].flatten.compact.map(&:id) : nil
-    queries_by_object_types = []
+
+    common_must = []
+
+    common_must << { query_string: { query: options[:q] } }
+
+    document_types = options[:scope].map(&:singularize)
+    common_must << { terms: { _type: document_types} }
+
+    if project_ids
+      common_must << {
+          has_parent: {
+              type: 'parent_project',
+              query: { ids: { values: project_ids } }
+          }
+      }
+    end
+
+    common_must_not = []
+
+    common_must_not << {
+        has_parent: {
+            type: 'parent_project',
+            query: { term: { status: { value: Project::STATUS_ARCHIVED } } }
+        }
+    }
+
+    common_should = []
+
     @object_types.each do |search_type|
       search_klass = search_type.to_s.classify.constantize
-      document_type = search_klass.index.get_type_from_document(search_klass)
-      queries_by_object_types << if search_klass.respond_to?(:allowed_to_search_query)
-        q = search_klass.allowed_to_search_query(User.current,
-                                                 :project_ids => project_ids)
-        "_type:#{document_type} AND (#{q})"
-      else
-        "_type:#{document_type}"
-      end
+      type_query = search_klass.allowed_to_search_query(User.current)
+      common_should << type_query if type_query
     end
-    search = Tire::Search::Search.new(index_names, search_options) do
-      query do
-        filtered do
-          query do
-            boolean(minimum_should_match: 1) do
-              must { string options[:q] }
-              queries_by_object_types.each do |filter_by_object_type|
-                should { string filter_by_object_type }
-              end
-            end
-          end
-        end
-      end
-      facet('types') { terms :_type }
-    end
+
+    payload = {
+        query: {
+            filtered: {
+                query: {
+                    bool: {
+                        must: common_must,
+                        must_not: common_must_not,
+                        should: common_should,
+                        minimum_should_match: 1
+                    }
+                }
+            }
+        },
+        facets: {
+            types: {
+                terms: {
+                    field: '_type',
+                    size: 10,
+                    all_terms: false
+                }
+            }
+        }
+    }
+
+    search_options = {
+        page: options[:page].to_i,
+        size: options[:size].to_i,
+        from: (options[:page].to_i - 1) * options[:size].to_i,
+        load: true,
+        payload: payload
+    }
+    search = Tire.search RedmineElasticsearch::INDEX_NAME, search_options
     @query_curl = search.to_curl
     search.results
   end
@@ -132,10 +164,6 @@ module RedmineElasticsearch::Patches::SearchControllerPatch
       end
     end
     results_by_type
-  end
-
-  def tire_index_names(object_types)
-    object_types.map { |object_type| object_type.classify.constantize.index_name }
   end
 end
 

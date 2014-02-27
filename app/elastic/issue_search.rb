@@ -51,24 +51,45 @@ module IssueSearch
 
     def allowed_to_search_query(user, options = {})
       options[:permission] = :view_issues
-      Project.allowed_to_search_query(user, options) do |role, user|
+      query = ParentProject.allowed_to_search_query(user, options) do |role, user|
         if user.logged?
           case role.issues_visibility
             when 'all'
               nil
             when 'default'
               user_ids = [user.id] + user.groups.map(&:id)
-              "(is_private:false OR author_id:#{user.id} OR assigned_to_id:(#{user_ids.join(' ')}))"
+              {
+                  bool: {
+                      should: [
+                          { term: { is_private: { value: false } } },
+                          { term: { author_id: { value: user.id } } },
+                          { terms: { assigned_to_id: user_ids } },
+                      ],
+                      minimum_should_match: 1
+                  }
+              }
             when 'own'
               user_ids = [user.id] + user.groups.map(&:id)
-              "(author_id:#{user.id} OR assigned_to_id:(#{user_ids.join(' ')}))"
+              {
+                  bool: {
+                      should: [
+                          { term: { author_id: { value: user.id } } },
+                          { terms: { assigned_to_id: user_ids } },
+                      ],
+                      minimum_should_match: 1
+                  }
+              }
             else
-              'id:0'
+              { term: { id: { value: 0 } } }
           end
         else
-          'is_private:false'
+          { term: { is_private: { value: false } } }
         end
       end
+      query[:bool] ||= {}
+      query[:bool][:must] ||= []
+      query[:bool][:must].insert 0, { term: { _type: 'issue' } }
+      query
     end
   end
 end
