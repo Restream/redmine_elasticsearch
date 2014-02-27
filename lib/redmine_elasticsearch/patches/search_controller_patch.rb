@@ -114,7 +114,7 @@ module RedmineElasticsearch::Patches::SearchControllerPatch
 
     common_should = []
 
-    @object_types.each do |search_type|
+    document_types.each do |search_type|
       search_klass = search_type.to_s.classify.constantize
       type_query = search_klass.allowed_to_search_query(User.current)
       common_should << type_query if type_query

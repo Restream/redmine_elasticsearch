@@ -65,6 +65,8 @@ class ParentProject < Project
         }
       end
 
+      must_queries << { term: { _type: options[:type] } } if options[:type].present?
+
       unless user.admin?
         statement_by_role = {}
         role = user.logged? ? Role.non_member : Role.anonymous

@@ -50,8 +50,11 @@ module IssueSearch
     end
 
     def allowed_to_search_query(user, options = {})
-      options[:permission] = :view_issues
-      query = ParentProject.allowed_to_search_query(user, options) do |role, user|
+      options = options.merge(
+          permission: :view_issues,
+          type: 'issue'
+      )
+      ParentProject.allowed_to_search_query(user, options) do |role, user|
         if user.logged?
           case role.issues_visibility
             when 'all'
@@ -86,10 +89,6 @@ module IssueSearch
           { term: { is_private: { value: false } } }
         end
       end
-      query[:bool] ||= {}
-      query[:bool][:must] ||= []
-      query[:bool][:must].insert 0, { term: { _type: 'issue' } }
-      query
     end
   end
 end

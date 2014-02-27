@@ -26,8 +26,11 @@ module ChangesetSearch
     end
 
     def allowed_to_search_query(user, options = {})
-      options[:permission] = :view_changesets
-      Project.allowed_to_search_query(user, options)
+      options = options.merge(
+          permission: :view_changesets,
+          type: 'changeset'
+      )
+      ParentProject.allowed_to_search_query(user, options)
     end
 
     def searching_scope(project_id)
