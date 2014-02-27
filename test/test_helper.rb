@@ -11,12 +11,13 @@ end
 
 class ActiveSupport::TestCase
   def search_all_for_klass(klass, user, options = {})
-    klass_query = klass.allowed_to_search_query(user)
+    type_query = klass.allowed_to_search_query(user)
     options.reverse_merge!(
-        :load => true,
-        :size => klass.count
+        load: true,
+        size: klass.count,
+        payload: { query: type_query }
     )
-    search = Tire.search(klass.index_name, options) { query { string klass_query } }
+    search = Tire.search(klass.index_name, options)
     search.results
   end
 end

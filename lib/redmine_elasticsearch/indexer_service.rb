@@ -14,6 +14,7 @@ class RedmineElasticsearch::IndexerService
           end
         end
       end
+      ParentProject.index.refresh
     end
 
     def search_klasses

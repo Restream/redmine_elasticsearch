@@ -35,7 +35,7 @@ module ApplicationSearch
     end
 
     def searching_scope(project_id)
-      self.where('project_id = ?', project_id).includes(searchable_options[:include])
+      self.where('project_id = ?', project_id)
     end
   end
 

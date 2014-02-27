@@ -8,6 +8,7 @@ class RedmineElasticsearch::SearchControllerTest < ActionController::TestCase
            :member_roles,
            :issues,
            :issue_statuses,
+           :journals,
            :versions,
            :trackers,
            :projects_trackers,
@@ -22,12 +23,7 @@ class RedmineElasticsearch::SearchControllerTest < ActionController::TestCase
     @user = User.find(2)
     User.current = @user
     @request.session[:user_id] = 2
-    klass = nil
-    Redmine::Search.available_search_types.each do |search_type|
-      klass = search_type.to_s.classify.constantize
-      klass.recreate_index
-    end
-    klass.index.refresh
+    RedmineElasticsearch::IndexerService.reindex_all
   end
 
   def test_index_success

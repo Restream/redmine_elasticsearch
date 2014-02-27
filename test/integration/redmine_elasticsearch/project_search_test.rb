@@ -22,8 +22,7 @@ class RedmineElasticsearch::ProjectSearchTest < ActionController::IntegrationTes
            :enumerations
 
   def setup
-    Project.recreate_index
-    Project.index.refresh
+    RedmineElasticsearch::IndexerService.reindex_all
   end
 
   def test_allowed_to_search_query_for_users
