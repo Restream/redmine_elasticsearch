@@ -43,7 +43,7 @@ module ProjectSearch
     end
 
     def searching_scope(project_id)
-      self.where("#{Project.table_name}.id = ?", project_id).includes(searchable_options[:include])
+      self.where("#{Project.table_name}.id = ?", project_id)
     end
   end
 end
