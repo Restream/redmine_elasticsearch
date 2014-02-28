@@ -17,11 +17,17 @@ module ChangesetSearch
       {
           id: { type: 'integer' },
           project_id: { type: 'integer', index: 'not_analyzed' },
-          revision: { type: 'string', index: 'not_analyzed' },
-          committer: { type: 'string' },
-          committed_on: { type: 'date' },
-          comments: { type: 'string' },
-          route_key: { type: 'string', not_analyzed: true }
+          route_key: { type: 'string', not_analyzed: true },
+
+          # acts_as_event fields
+          committed_on: { type: 'date', index_name: 'datetime' },
+          title: { type: 'string' },
+          comments: { type: 'string', index_name: 'description' },
+          committer: { type: 'string', index_name: 'author' },
+          url: { type: 'string', index: 'not_analyzed' },
+          type: { type: 'string', index: 'not_analyzed' },
+
+          revision: { type: 'string', index: 'not_analyzed' }
       }.merge(additional_index_mappings)
     end
 

@@ -23,7 +23,7 @@ module NewsSearch
           title: { type: 'string' },
           description: { type: 'string' },
           author: { type: 'string' },
-          url: { type: 'string' },
+          url: { type: 'string', index: 'not_analyzed' },
           type: { type: 'string', index: 'not_analyzed' },
 
           summary: { type: 'string' },
