@@ -17,11 +17,17 @@ module DocumentSearch
       {
           id: { type: 'integer' },
           project_id: { type: 'integer', index: 'not_analyzed' },
+          route_key: { type: 'string', not_analyzed: true },
+
+          # acts_as_event fields
+          created_on: { type: 'date', index_name: 'datetime' },
           title: { type: 'string' },
           description: { type: 'string' },
-          category: { type: 'string' },
-          created_on: { type: 'date' },
-          route_key: { type: 'string', not_analyzed: true }
+          author: { type: 'string' },
+          url: { type: 'string', index: 'not_analyzed' },
+          type: { type: 'string', index: 'not_analyzed' },
+
+          category: { type: 'string' }
       }.merge(additional_index_mappings)
     end
 
