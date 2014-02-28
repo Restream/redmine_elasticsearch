@@ -17,15 +17,19 @@ module IssueSearch
       {
           id: { type: 'integer' },
           project_id: { type: 'integer', index: 'not_analyzed' },
+          route_key: { type: 'string', not_analyzed: true },
 
-          subject: { type: 'string' },
+          # acts_as_event fields
+          created_on: { type: 'date', index_name: 'datetime' },
+          subject: { type: 'string', index_name: 'title' },
           description: { type: 'string' },
+          author: { type: 'string' },
+          url: { type: 'string', index: 'not_analyzed' },
+          type: { type: 'string', index: 'not_analyzed' },
 
-          created_on: { type: 'date' },
           updated_on: { type: 'date' },
           closed_on: { type: 'date' },
 
-          author: { type: 'string' },
           author_id: { type: 'integer', index: 'not_analyzed' },
 
           assigned_to: { type: 'string' },
@@ -44,8 +48,7 @@ module IssueSearch
                   id: { type: 'integer', index: 'not_analyzed' },
                   notes: { type: 'string' }
               }
-          },
-          route_key: { type: 'string', not_analyzed: true }
+          }
       }.merge(additional_index_mappings)
     end
 
