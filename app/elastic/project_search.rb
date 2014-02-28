@@ -16,15 +16,21 @@ module ProjectSearch
     def project_mappings_hash
       {
           id: { type: 'integer', index_name: 'project_id', not_analyzed: true },
-          name: { type: 'string', analyzer: 'index_analyzer' },
-          description: { type: 'string', analyzer: 'index_analyzer' },
+          route_key: { type: 'string', not_analyzed: true },
+
+          # acts_as_event fields
+          created_on: { type: 'date', index_name: 'datetime' },
+          name: { type: 'string', index_name: 'title' },
+          description: { type: 'string' },
+          author: { type: 'string' },
+          url: { type: 'string', index: 'not_analyzed' },
+          type: { type: 'string', index: 'not_analyzed' },
+
           homepage: { type: 'string' },
           identifier: { type: 'string' },
-          created_on: { type: 'date' },
           updated_on: { type: 'date' },
           custom_field_values: { type: 'string', index_name: 'cfv' },
-          is_public: { type: 'boolean' },
-          route_key: { type: 'string', not_analyzed: true }
+          is_public: { type: 'boolean' }
       }.merge(additional_index_mappings)
     end
 
