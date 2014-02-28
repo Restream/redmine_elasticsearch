@@ -2,7 +2,11 @@ require File.expand_path(File.dirname(__FILE__) + '../../../../test/test_helper'
 
 ParentProject.stubs(:index_settings).returns(
     {
-        index: { store: { type: :memory } },
+        index: {
+            store: { type: :memory },
+            number_of_shards: 1,
+            number_of_replicas: 0
+        },
         analysis: {
             analyzer: {
                 :index_analyzer => {
