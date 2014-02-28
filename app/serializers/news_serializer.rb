@@ -1,4 +1,4 @@
-class NewsSerializer < BaseChildSerializer
+class NewsSerializer < BaseSerializer
   attributes :project_id,
              :title, :summary, :description,
              :created_on,

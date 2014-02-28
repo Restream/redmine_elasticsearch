@@ -1,9 +1,12 @@
-class ParentProjectSerializer < BaseSerializer
-  attributes :is_public,
+class ParentProjectSerializer < ActiveModel::Serializer
+  self.root = false
+
+  attributes :id,
+             :is_public,
              :status,
              :enabled_module_names, :route_key
 
   def route_key
-    ROUTE_KEY
+    RedmineElasticsearch::IndexerService::ROUTE_KEY
   end
 end

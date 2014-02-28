@@ -1,4 +1,4 @@
-class IssueSerializer < BaseChildSerializer
+class IssueSerializer < BaseSerializer
   attributes :project_id,
              :subject, :description,
              :created_on, :updated_on, :closed_on,

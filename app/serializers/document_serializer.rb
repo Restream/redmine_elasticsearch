@@ -1,4 +1,4 @@
-class DocumentSerializer < BaseChildSerializer
+class DocumentSerializer < BaseSerializer
   attributes :project_id,
              :title, :description,
              :created_on,

@@ -1,4 +1,4 @@
-class ProjectSerializer < BaseChildSerializer
+class ProjectSerializer < BaseSerializer
   attributes :name, :description,
              :homepage, :identifier,
              :created_on,

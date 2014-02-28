@@ -1,4 +1,4 @@
-class ChangesetSerializer < BaseChildSerializer
+class ChangesetSerializer < BaseSerializer
   attributes :project_id,
              :revision, :committer, :committed_on, :comments
 
