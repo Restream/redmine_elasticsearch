@@ -2,6 +2,7 @@ class RedmineElasticsearch::IndexerService
   class << self
     def reindex_all
       ParentProject.recreate_index
+      ParentProject.index.refresh
       klasses = search_klasses
       klasses.each { |search_klass| search_klass.update_mapping }
       ParentProject.searching_scope.find_each do |parent_project|
