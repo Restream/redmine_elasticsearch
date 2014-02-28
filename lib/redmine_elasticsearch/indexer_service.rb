@@ -32,8 +32,11 @@ module RedmineElasticsearch
       end
 
       def recreate_index
-        result = ParentProject.recreate_index
-        raise IndexerError.new("Can't create index. #{result.to_s}") unless result
+        index = ParentProject.index
+        index.refresh
+        index.delete if index.exists?
+        result = index.create settings: ParentProject.index_settings, mappings: ParentProject.index_mappings
+        raise IndexerError.new("Can't create index: \n#{index.response.try(:body)}\n") unless result
       end
 
       def search_klasses

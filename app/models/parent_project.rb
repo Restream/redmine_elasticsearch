@@ -2,11 +2,6 @@ class ParentProject < Project
   index_name RedmineElasticsearch::INDEX_NAME
 
   class << self
-    def recreate_index
-      tire.index.delete if tire.index.exists?
-      tire.index.create settings: index_settings, mappings: index_mappings
-    end
-
     def index_settings
       {
           analysis: {
