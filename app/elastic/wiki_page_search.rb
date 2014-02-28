@@ -17,15 +17,17 @@ module WikiPageSearch
       {
           id: { type: 'integer' },
           project_id: { type: 'integer', index: 'not_analyzed' },
+          route_key: { type: 'string', not_analyzed: true },
 
+          # acts_as_event fields
+          created_on: { type: 'date', index_name: 'datetime' },
           title: { type: 'string' },
-          text: { type: 'string' },
+          text: { type: 'string', index_name: 'description' },
+          author: { type: 'string' },
+          url: { type: 'string', index: 'not_analyzed' },
+          type: { type: 'string', index: 'not_analyzed' },
 
-          created_on: { type: 'date' },
-          updated_on: { type: 'date' },
-
-          route_key: { type: 'string', not_analyzed: true }
-
+          updated_on: { type: 'date' }
       }.merge(additional_index_mappings)
     end
 

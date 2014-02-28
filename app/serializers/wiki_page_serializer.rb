@@ -6,4 +6,8 @@ class WikiPageSerializer < BaseSerializer
   def project_id
     object.wiki.try(:project_id)
   end
+
+  def author
+    nil
+  end
 end
