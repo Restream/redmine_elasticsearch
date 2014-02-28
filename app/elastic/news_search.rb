@@ -17,10 +17,16 @@ module NewsSearch
       {
           id: { type: 'integer' },
           project_id: { type: 'integer', index: 'not_analyzed' },
+
+          # acts_as_event fields
+          created_on: { type: 'date', index_name: 'datetime' },
           title: { type: 'string' },
-          summary: { type: 'string' },
           description: { type: 'string' },
           author: { type: 'string' },
+          url: { type: 'string' },
+          type: { type: 'string', index: 'not_analyzed' },
+
+          summary: { type: 'string' },
           created_on: { type: 'date' },
           comments_count: { type: 'integer', index: 'not_analyzed' },
           route_key: { type: 'string', not_analyzed: true }
