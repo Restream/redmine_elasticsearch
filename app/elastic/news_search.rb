@@ -17,6 +17,7 @@ module NewsSearch
       {
           id: { type: 'integer' },
           project_id: { type: 'integer', index: 'not_analyzed' },
+          route_key: { type: 'string', not_analyzed: true },
 
           # acts_as_event fields
           created_on: { type: 'date', index_name: 'datetime' },
@@ -27,9 +28,7 @@ module NewsSearch
           type: { type: 'string', index: 'not_analyzed' },
 
           summary: { type: 'string' },
-          created_on: { type: 'date' },
-          comments_count: { type: 'integer', index: 'not_analyzed' },
-          route_key: { type: 'string', not_analyzed: true }
+          comments_count: { type: 'integer', index: 'not_analyzed' }
       }.merge(additional_index_mappings)
     end
 
