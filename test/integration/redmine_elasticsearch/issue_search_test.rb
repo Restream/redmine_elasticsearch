@@ -1,11 +1,5 @@
 require File.expand_path('../../../test_helper', __FILE__)
 
-class Issue
-  def self.index_settings
-    { index: { store: { type: :memory } } }
-  end
-end
-
 class RedmineElasticsearch::IssueSearchTest < ActionController::IntegrationTest
   fixtures :projects,
            :users,
@@ -22,6 +16,7 @@ class RedmineElasticsearch::IssueSearchTest < ActionController::IntegrationTest
            :enumerations
 
   def setup
+    stub_index_settings
     RedmineElasticsearch::IndexerService.reindex_all
   end
 

@@ -23,6 +23,7 @@ class RedmineElasticsearch::SearchControllerTest < ActionController::TestCase
     @user = User.find(2)
     User.current = @user
     @request.session[:user_id] = 2
+    stub_index_settings
     RedmineElasticsearch::IndexerService.reindex_all
   end
 
