@@ -29,6 +29,7 @@ module ApplicationSearch
     end
 
     def update_mapping
+      index.refresh
       index_mappings.each do |k, v|
         index.mapping! k, v
       end
