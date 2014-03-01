@@ -108,13 +108,15 @@ module RedmineElasticsearch::Patches::SearchControllerPatch
         {
             query_string: {
                 query: options[:q],
-                default_operator: options[:all_words] ? 'and' : 'or'
+                default_operator: options[:all_words] ? 'and' : 'or',
+                default_field: options[:titles_only] ? 'title' : '_all'
             }
         }
       when :match
+        query_field = options[:titles_only] ? :title : :_all
         {
             match: {
-                _all: {
+                query_field => {
                     query: options[:q],
                     operator: options[:all_words] ? 'and' : 'or'
                 }
