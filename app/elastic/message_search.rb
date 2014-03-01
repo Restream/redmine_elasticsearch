@@ -28,7 +28,7 @@ module MessageSearch
           type: { type: 'string', index: 'not_analyzed' },
 
           updated_on: { type: 'date' },
-          replies_count: { type: 'date', index: 'not_analyzed' }
+          replies_count: { type: 'integer', index: 'not_analyzed' }
       }.merge(additional_index_mappings)
     end
 
