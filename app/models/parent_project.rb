@@ -9,12 +9,12 @@ class ParentProject < Project
                   :index_analyzer => {
                       type: 'custom',
                       tokenizer: 'standard',
-                      filter: %w(lowercase russian_morphology english_morphology)
+                      filter: %w(lowercase)
                   },
                   :search_analyzer => {
                       type: 'custom',
                       tokenizer: 'standard',
-                      filter: %w(lowercase russian_morphology english_morphology)
+                      filter: %w(lowercase)
                   }
               }
           }
