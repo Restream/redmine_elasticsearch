@@ -17,7 +17,15 @@ module RedmineElasticsearch::Patches::SearchControllerPatch
       # quick jump to an issue
       redirect_to issue_path(issue)
     else
-      @results = perform_search(
+      # First searching with advanced query with parsing it on elasticsearch side.
+      # If it fails then use match query.
+      # http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-match-query.html#_comparison_to_query_string_field
+      # The match family of queries does not go through a "query parsing" process.
+      # It does not support field name prefixes, wildcard characters, or other "advance" features.
+      # For this reason, chances of it failing are very small / non existent,
+      # and it provides an excellent behavior when it comes to just analyze and
+      # run that text as a query behavior (which is usually what a text search box does).
+      search_options = {
           :scope => @scope,
           :q => @question,
           :titles_only => @titles_only,
@@ -25,16 +33,22 @@ module RedmineElasticsearch::Patches::SearchControllerPatch
           :page => params[:page] || 1,
           :size => RESULT_SIZE,
           :projects => @projects_to_search
-      )
+      }
+      begin
+        search_options[:search_type] = :query_string
+        @results = perform_search(search_options)
+      rescue Tire::Search::SearchRequestFailed => e
+        logger.debug e
+        search_options[:search_type] = :match
+        @results = perform_search(search_options)
+      end
+      @search_type = search_options[:search_type]
       @results_by_type = get_results_by_type_from_search_results(@results)
       render :layout => false if request.xhr?
     end
-  #rescue Tire::Search::SearchRequestFailed => e
-  #  logger.error e
-  #  render_error :message => :search_request_failed, :status => 503
-  #rescue Errno::ECONNREFUSED => e
-  #  logger.error e
-  #  render_error :message => :search_connection_refused, :status => 503
+  rescue Errno::ECONNREFUSED => e
+    logger.error e
+    render_error :message => :search_connection_refused, :status => 503
   end
 
   private
@@ -84,12 +98,31 @@ module RedmineElasticsearch::Patches::SearchControllerPatch
   end
 
   def perform_search(options = {})
-    return [] if options[:q].blank?
+    #todo: refactor this
     project_ids = options[:projects] ? [options[:projects]].flatten.compact.map(&:id) : nil
 
     common_must = []
 
-    common_must << { query_string: { query: options[:q] } }
+    common_must << case options[:search_type]
+      when :query_string
+        {
+            query_string: {
+                query: options[:q],
+                default_operator: options[:all_words] ? 'and' : 'or'
+            }
+        }
+      when :match
+        {
+            match: {
+                _all: {
+                    query: options[:q],
+                    operator: options[:all_words] ? 'and' : 'or'
+                }
+            }
+        }
+      else
+        raise "Unknown search_type: #{options[:search_type].inspect}"
+    end
 
     document_types = options[:scope].map(&:singularize)
     common_must << { terms: { _type: document_types} }

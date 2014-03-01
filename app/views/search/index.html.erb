@@ -20,10 +20,7 @@
     <p><%= submit_tag l(:button_submit), :name => 'submit' %></p>
   <% end %>
   <p>
-    query took <%= @results.time %> ms
-  </p>
-  <p>
-    <%= @query_curl %>
+    query took <%= @results.time %> ms, search type: <%= @search_type %>
   </p>
 </div>
 
