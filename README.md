@@ -1,29 +1,18 @@
 # Full text searching plugin for Redmine
 
-*This version is under heavy development, and a lot of stuff is not working yet*
-
 [![Build Status](https://travis-ci.org/Undev/redmine_elasticsearch.png?branch=master)](https://travis-ci.org/Undev/redmine_elasticsearch)
 [![Code Climate](https://codeclimate.com/github/Undev/redmine_elasticsearch.png)](https://codeclimate.com/github/Undev/redmine_elasticsearch)
 
 This plugin integrates elasticsearch into Redmine
 
-
 ## Description
-
-todo
 
 You can add additional index options to config/additional_environment.rb.
 For example:
 
     config.additional_index_properties = {
         :issues => {
-            :issue_tags => {
-                :properties => {
-                    :name => { :type => 'string' }
-                }
-            },
             :tags => { :type => 'string' }
-
         }
     }
 
@@ -31,13 +20,29 @@ All this options will be joined to index settings.
 
 ## Install
 
-1. Copy plugin directory into REDMINE_ROOT/plugins.
-If you are downloading the plugin directly from GitHub,
-you can do so by changing into your REDMINE_ROOT directory and issuing a command like
 
+1. Download and install "elasticsearch":http://www.elasticsearch.org/overview/elkdownloads/
+2. Install the required "redmine_resque":https://github.com/Undev/redmine_resque plugin
+
+        cd YOUR_REDMINE_ROOT
+        git clone https://github.com/Undev/redmine_resque.git plugins/redmine_resque
+
+3. Install this plugin
+
+        cd YOUR_REDMINE_ROOT
         git clone https://github.com/Undev/redmine_elasticsearch.git plugins/redmine_elasticsearch
 
-2. Restart Redmine
+4. Reindex all documents with the following command
+
+        cd YOUR_REDMINE_ROOT
+        bundle exec rake redmine_elasticsearch:reindex_all RAILS_ENV=production
+
+5. Start resque worker
+
+        cd YOUR_REDMINE_ROOT
+        bundle exec rake resque:work RAILS_ENV=production
+
+6. Restart Redmine
 
 ## Links
 
