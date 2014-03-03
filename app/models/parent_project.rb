@@ -86,7 +86,7 @@ class ParentProject < Project
           end
         end
         if statement_by_role.empty?
-          must_queries = [{ query: { term: { id: { value: 0 } } } }]
+          must_queries = [{ term: { id: { value: 0 } } }]
         else
           if block_given?
             statement_by_role.each do |role, statement|

@@ -8,7 +8,7 @@ Redmine::Plugin.register :redmine_elasticsearch do
   name        'Full text searching plugin for Redmine'
   description 'This plugin integrates elasticsearch into Redmine'
   author      'Undev'
-  version     '0.1.0'
+  version     '0.1.1'
   url         'https://github.com/Undev/redmine_elasticsearch'
 
   requires_redmine :version_or_higher => '2.1'
