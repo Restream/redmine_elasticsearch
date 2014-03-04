@@ -32,17 +32,21 @@ All this options will be joined to index settings.
         cd YOUR_REDMINE_ROOT
         git clone https://github.com/Undev/redmine_elasticsearch.git plugins/redmine_elasticsearch
 
-4. Reindex all documents with the following command
+4. Install required gems
+
+        bundle install
+
+5. Reindex all documents with the following command
 
         cd YOUR_REDMINE_ROOT
         bundle exec rake redmine_elasticsearch:reindex_all RAILS_ENV=production
 
-5. Start resque worker
+6. Start resque worker
 
         cd YOUR_REDMINE_ROOT
         bundle exec rake resque:work RAILS_ENV=production
 
-6. Restart Redmine
+7. Restart Redmine
 
 ## Links
 
