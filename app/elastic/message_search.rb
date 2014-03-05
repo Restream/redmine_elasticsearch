@@ -21,8 +21,8 @@ module MessageSearch
 
           # acts_as_event fields
           created_on: { type: 'date', index_name: 'datetime' },
-          subject: { type: 'string', index_name: 'title' },
-          content: { type: 'string', index_name: 'description' },
+          subject: { type: 'string', index_name: 'title', boost: 8 },
+          content: { type: 'string', index_name: 'description', boost: 4 },
           author: { type: 'string' },
           url: { type: 'string', index: 'not_analyzed' },
           type: { type: 'string', index: 'not_analyzed' },

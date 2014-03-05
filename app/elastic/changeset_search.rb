@@ -21,8 +21,8 @@ module ChangesetSearch
 
           # acts_as_event fields
           committed_on: { type: 'date', index_name: 'datetime' },
-          title: { type: 'string' },
-          comments: { type: 'string', index_name: 'description' },
+          title: { type: 'string', boost: 2 },
+          comments: { type: 'string', index_name: 'description', boost: 4 },
           committer: { type: 'string', index_name: 'author' },
           url: { type: 'string', index: 'not_analyzed' },
           type: { type: 'string', index: 'not_analyzed' },

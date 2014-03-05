@@ -21,8 +21,8 @@ module DocumentSearch
 
           # acts_as_event fields
           created_on: { type: 'date', index_name: 'datetime' },
-          title: { type: 'string' },
-          description: { type: 'string' },
+          title: { type: 'string', boost: 8 },
+          description: { type: 'string', boost: 4 },
           author: { type: 'string' },
           url: { type: 'string', index: 'not_analyzed' },
           type: { type: 'string', index: 'not_analyzed' },

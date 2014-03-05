@@ -25,8 +25,8 @@ module ProjectSearch
 
           # acts_as_event fields
           created_on: { type: 'date', index_name: 'datetime' },
-          name: { type: 'string', index_name: 'title' },
-          description: { type: 'string' },
+          name: { type: 'string', index_name: 'title', boost: 8 },
+          description: { type: 'string', boost: 4 },
           author: { type: 'string' },
           url: { type: 'string', index: 'not_analyzed' },
           type: { type: 'string', index: 'not_analyzed' },

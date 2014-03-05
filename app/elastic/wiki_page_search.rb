@@ -21,8 +21,8 @@ module WikiPageSearch
 
           # acts_as_event fields
           created_on: { type: 'date', index_name: 'datetime' },
-          title: { type: 'string' },
-          text: { type: 'string', index_name: 'description' },
+          title: { type: 'string', boost: 8 },
+          text: { type: 'string', index_name: 'description', boost: 4 },
           author: { type: 'string' },
           url: { type: 'string', index: 'not_analyzed' },
           type: { type: 'string', index: 'not_analyzed' },
