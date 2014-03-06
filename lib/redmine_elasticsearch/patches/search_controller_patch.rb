@@ -61,6 +61,12 @@ module RedmineElasticsearch::Patches::SearchControllerPatch
     @projects_to_search = get_projects_from_params
     @object_types = allowed_object_types(@projects_to_search)
     @scope = filter_object_types_from_params(@object_types)
+
+    # extract tokens from the question
+    # eg. hello "bye bye" => ["hello", "bye bye"]
+    @tokens = @question.scan(%r{((\s|^)"[\s\w]+"(\s|$)|\S+)}).collect {|m| m.first.gsub(%r{(^\s*"\s*|\s*"\s*$)}, '')}
+    # tokens must be at least 2 characters long
+    @tokens = @tokens.uniq.select {|w| w.length > 1 }
   end
 
   def detect_issue_in_question(question)
