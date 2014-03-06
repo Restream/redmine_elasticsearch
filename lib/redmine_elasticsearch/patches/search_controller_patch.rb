@@ -174,6 +174,10 @@ module RedmineElasticsearch::Patches::SearchControllerPatch
                 }
             }
         },
+        sort: [
+            { datetime: { order: 'desc' } },
+            :_score
+        ],
         facets: {
             types: {
                 terms: {
