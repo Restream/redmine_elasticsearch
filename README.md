@@ -18,6 +18,8 @@ For example:
 
 All this options will be joined to index settings.
 
+You can explicit set elasticsearch node by setting ELASTICSEARCH_URL environment variable.
+
 ## Install
 
 
