@@ -1,3 +1,11 @@
 ru:
   search_request_failed: Поисковый запрос к сервису полнотекстового поиска не выполнен.
-  search_connection_refused: Не удается подкличиться к сервису полнотекстового поиска.
+  search_connection_refused: Не удается подключиться к сервису полнотекстового поиска.
+
+  views:
+      pagination:
+        first: "&laquo; Первая"
+        last: "Последняя &raquo;"
+        previous: "&lsaquo; Назад"
+        next: "Вперед &rsaquo;"
+        truncate: "..."

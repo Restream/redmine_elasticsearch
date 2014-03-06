@@ -1,3 +1,11 @@
 en:
   search_request_failed: Search request to full text search engine failed.
   search_connection_refused: Connection to full text search engine refused.
+
+  views:
+      pagination:
+        first: "&laquo; First"
+        last: "Last &raquo;"
+        previous: "&lsaquo; Prev"
+        next: "Next &rsaquo;"
+        truncate: "..."
