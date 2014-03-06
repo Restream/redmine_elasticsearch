@@ -10,7 +10,10 @@ class IssueSerializer < BaseSerializer
              :status,
              :done_ratio,
              :custom_field_values,
-             :is_private
+             :is_private,
+             :priority,
+             :fixed_version,
+             :due_date
 
   has_many :journals, :serializer => JournalSerializer
 
@@ -37,5 +40,13 @@ class IssueSerializer < BaseSerializer
 
   def closed_on
     Redmine::VERSION.to_s >= '2.3.0' ? object.closed_on : nil
+  end
+
+  def priority
+    object.priority.try(:name)
+  end
+
+  def fixed_version
+    object.fixed_version.try(:name)
   end
 end

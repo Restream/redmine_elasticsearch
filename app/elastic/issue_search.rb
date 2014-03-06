@@ -43,6 +43,10 @@ module IssueSearch
 
           is_private: { type: 'boolean' },
 
+          priority: { type: 'string' },
+          fixed_version: { type: 'string', index_name: 'version' },
+          due_date: { type: 'date' },
+
           journals: {
               properties: {
                   id: { type: 'integer', index: 'not_analyzed' },
