@@ -149,7 +149,7 @@ module RedmineElasticsearch::Patches::SearchControllerPatch
     common_must_not << {
         has_parent: {
             type: 'parent_project',
-            query: { term: { status: { value: Project::STATUS_ARCHIVED } } }
+            query: { term: { status_id: { value: Project::STATUS_ARCHIVED } } }
         }
     }
 

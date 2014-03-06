@@ -34,7 +34,7 @@ class ParentProject < Project
       {
           id: { type: 'integer', index_name: 'project_id', not_analyzed: true },
           is_public: { type: 'boolean' },
-          status: { type: 'integer', not_analyzed: true },
+          status_id: { type: 'integer', not_analyzed: true },
           enabled_module_names: { type: 'string', not_analyzed: true },
           route_key: { type: 'string', not_analyzed: true }
       }
