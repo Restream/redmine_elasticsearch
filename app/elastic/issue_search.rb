@@ -29,6 +29,7 @@ module IssueSearch
 
           updated_on: { type: 'date' },
           closed_on: { type: 'date' },
+          due_date: { type: 'date' },
 
           author_id: { type: 'integer', index: 'not_analyzed' },
 
@@ -41,11 +42,11 @@ module IssueSearch
 
           custom_field_values: { type: 'string', index_name: 'cfv' },
 
-          is_private: { type: 'boolean' },
+          private: { type: 'boolean', index_name: 'is_private' },
+          closed: { type: 'boolean', index_name: 'is_closed' },
 
           priority: { type: 'string' },
           fixed_version: { type: 'string', index_name: 'version' },
-          due_date: { type: 'date' },
 
           journals: {
               properties: {

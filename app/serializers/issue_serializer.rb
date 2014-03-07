@@ -10,10 +10,11 @@ class IssueSerializer < BaseSerializer
              :status,
              :done_ratio,
              :custom_field_values,
-             :is_private,
+             :private,
              :priority,
              :fixed_version,
-             :due_date
+             :due_date,
+             :closed
 
   has_many :journals, :serializer => JournalSerializer
 
@@ -48,5 +49,13 @@ class IssueSerializer < BaseSerializer
 
   def fixed_version
     object.fixed_version.try(:name)
+  end
+
+  def private
+    object.is_private?
+  end
+
+  def closed
+    object.closed?
   end
 end
