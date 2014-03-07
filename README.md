@@ -7,21 +7,96 @@ This plugin integrates elasticsearch into Redmine
 
 ## Description
 
-You can add additional index options to config/additional_environment.rb.
-For example:
+The query string is parsed into a series of terms and operators.
+A term can be a single word *quick* or *brown* or a phrase, surrounded by double quotes *"quick brown"* 
+which searches for all the words in the phrase, in the same order.
+Operators allow you to customize the search. More detailed query syntax here: http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html
 
-    config.additional_index_properties = {
-        :issues => {
-            :tags => { :type => 'string' }
-        }
-    }
+Search and counting of results is made with regard to the rights of the current user.
 
-All this options will be joined to index settings.
+Below is a list of fields that can be searched.
 
-You can explicit set elasticsearch node by setting ELASTICSEARCH_URL environment variable.
+### Issues
+
+* subject ~ title
+* description
+* author
+* category
+* created_on ~ datetime (for redmine 2.3.0 and higher)
+* updated_on
+* closed_on
+* due_date
+* assigned_to
+* category
+* status
+* priority
+* done_ratio
+* custom_field_values
+* fixed_version ~ version
+* is_private ~ private
+* is_closed ~ closed
+* journals.notes
+
+*'subject ~ title' means that you can use 'subject' or 'title' in query*
+
+For example this query will search issues with done_ratio from 0 to 50 and due_date before april 2014:
+
+    done_ratio:[0 50] AND due_date:[* 2014-04]
+
+### Changesets
+
+* committed_on ~ datetime
+* title
+* comments ~ description
+* committer ~ author
+
+### Documents
+
+* created_on ~ datetime
+* title
+* description
+* author
+* category
+
+### Forum messages
+
+* created_on ~ datetime
+* subject ~ title
+* content ~ description
+* author
+* updated_on
+* replies_count
+
+### Projects
+
+* created_on ~ datetime
+* name ~ title
+* description
+* author
+* updated_on
+* homepage
+* identifier
+* custom_field_values
+* is_public
+
+### Wiki pages
+
+* created_on ~ datetime
+* title
+* text ~ description
+* author
+* updated_on
+
+### News
+
+* created_on ~ datetime
+* title
+* description
+* author
+* summary
+* comments_count
 
 ## Install
-
 
 1. Download and install "elasticsearch":http://www.elasticsearch.org/overview/elkdownloads/
 2. Install the required "redmine_resque":https://github.com/Undev/redmine_resque plugin
@@ -50,9 +125,25 @@ You can explicit set elasticsearch node by setting ELASTICSEARCH_URL environment
 
 7. Restart Redmine
 
+## Configuration
+
+You can add additional index options to config/additional_environment.rb.
+For example:
+
+    config.additional_index_properties = {
+        :issues => {
+            :tags => { :type => 'string' }
+        }
+    }
+
+All this options will be joined to index settings.
+
+You can explicit set elasticsearch node by setting ELASTICSEARCH_URL environment variable.
+
 ## Links
 
 - http://www.redmine.org/
+- https://github.com/karmi/retire
 - http://www.elasticsearch.org/
 
 ## License
