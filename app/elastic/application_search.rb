@@ -35,6 +35,14 @@ module ApplicationSearch
       end
     end
 
+    def allowed_to_search_query(user, options = {})
+      options = options.merge(
+          permission: :view_project,
+          type: 'project'
+      )
+      ParentProject.allowed_to_search_query(user, options)
+    end
+
     def searching_scope(project_id)
       self.where('project_id = ?', project_id)
     end
