@@ -2,16 +2,24 @@ module RedmineElasticsearch::Patches::RedmineSearch
   extend ActiveSupport::Concern
 
   included do
-    class << self
-      alias_method_chain :register, :elasticsearch
+    # watching for changing size of available_search_types
+    class << available_search_types
+      Array.instance_methods(false).each do |meth|
+        old = instance_method(meth)
+        define_method(meth) do |*args, &block|
+          old_size = size
+          old.bind(self).call(*args, &block)
+          Redmine::Search.update_search_methods if old_size != size
+        end if [:add, :<<].include?(meth)
+      end
     end
-    available_search_types.each { |search_type| include_search_methods(search_type) }
+
+    update_search_methods
   end
 
   module ClassMethods
-    def register_with_elasticsearch(search_type, options = {})
-      include_search_methods(search_type)
-      register_without_elasticsearch(search_type, options)
+    def update_search_methods
+      available_search_types.each { |search_type| include_search_methods(search_type) } if available_search_types
     end
 
     private
