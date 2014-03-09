@@ -20,7 +20,17 @@ module ApplicationSearch
   module ClassMethods
 
     def index_mappings
-      { }.merge(additional_index_mappings)
+      {
+          document_type => {
+              _parent: { type: 'parent_project' },
+              _routing: { required: true, path: 'route_key' },
+              properties: {
+                  id: { type: 'integer' },
+                  project_id: { type: 'integer', index: 'not_analyzed' },
+                  route_key: { type: 'string', not_analyzed: true },
+              }.merge(additional_index_mappings)
+          }
+      }
     end
 
     def additional_index_mappings
@@ -38,7 +48,7 @@ module ApplicationSearch
     def allowed_to_search_query(user, options = {})
       options = options.merge(
           permission: :view_project,
-          type: 'project'
+          type: document_type
       )
       ParentProject.allowed_to_search_query(user, options)
     end

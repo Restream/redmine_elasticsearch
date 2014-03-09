@@ -9,7 +9,7 @@ class BaseSerializer < ActiveModel::Serializer
   end
 
   def _parent
-    project_id
+    object.project_id if object.respond_to? :project_id
   end
 
   def _routing
@@ -26,6 +26,8 @@ class BaseSerializer < ActiveModel::Serializer
 
   def url
     url_for object.event_url(default_url_options)
+  rescue
+    nil
   end
 
   def default_url_options
