@@ -21,8 +21,12 @@ module IssueSearch
 
           # acts_as_event fields
           created_on: { type: 'date', index_name: 'datetime' },
-          subject: { type: 'string', index_name: 'title', boost: 8 },
-          description: { type: 'string', boost: 4 },
+          subject: { type: 'string', index_name: 'title',
+                     search_analyzer: 'search_analyzer',
+                     index_analyzer: 'index_analyzer' },
+          description: { type: 'string',
+                         search_analyzer: 'search_analyzer',
+                         index_analyzer: 'index_analyzer' },
           author: { type: 'string' },
           url: { type: 'string', index: 'not_analyzed' },
           type: { type: 'string', index: 'not_analyzed' },
@@ -51,7 +55,10 @@ module IssueSearch
           journals: {
               properties: {
                   id: { type: 'integer', index: 'not_analyzed' },
-                  notes: { type: 'string' }
+                  notes: { type: 'string',
+                           index_name: 'notes',
+                           search_analyzer: 'search_analyzer',
+                           index_analyzer: 'index_analyzer' }
               }
           }
       }.merge(additional_index_mappings)
