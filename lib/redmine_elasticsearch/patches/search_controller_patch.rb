@@ -109,23 +109,25 @@ module RedmineElasticsearch::Patches::SearchControllerPatch
 
     common_must = []
 
+    search_fields = options[:titles_only] ? ['title'] : %w(title description notes)
+    search_operator = options[:all_words] ? 'and' : 'or'
     common_must << case options[:search_type]
       when :query_string
         {
             query_string: {
                 query: options[:q],
-                default_operator: options[:all_words] ? 'and' : 'or',
-                default_field: options[:titles_only] ? 'title' : '_all'
+                default_operator: search_operator,
+                fields: search_fields,
+                use_dis_max: true
             }
         }
       when :match
-        query_field = options[:titles_only] ? :title : :_all
         {
-            match: {
-                query_field => {
-                    query: options[:q],
-                    operator: options[:all_words] ? 'and' : 'or'
-                }
+            multi_match: {
+                query: options[:q],
+                operator: search_operator,
+                fields: search_fields,
+                use_dis_max: true
             }
         }
       else

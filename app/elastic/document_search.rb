@@ -21,8 +21,12 @@ module DocumentSearch
 
           # acts_as_event fields
           created_on: { type: 'date', index_name: 'datetime' },
-          title: { type: 'string', boost: 8 },
-          description: { type: 'string', boost: 4 },
+          title: { type: 'string',
+                   search_analyzer: 'search_analyzer',
+                   index_analyzer: 'index_analyzer' },
+          description: { type: 'string',
+                         search_analyzer: 'search_analyzer',
+                         index_analyzer: 'index_analyzer' },
           author: { type: 'string' },
           url: { type: 'string', index: 'not_analyzed' },
           type: { type: 'string', index: 'not_analyzed' },
