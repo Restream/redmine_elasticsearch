@@ -98,8 +98,14 @@ For example this query will search issues with done_ratio from 0 to 50 and due_d
 
 ## Install
 
-1. Download and install [elasticsearch](http://www.elasticsearch.org/overview/elkdownloads/)
-2. Install the required [redmine_resque](https://github.com/Undev/redmine_resque) plugin
+1. Download and install [Elasticsearch](http://www.elasticsearch.org/overview/elkdownloads/)
+
+    Also you need to install [Morphological Analysis Plugin for ElasticSearch](https://github.com/imotov/elasticsearch-analysis-morphology)
+
+    Check installation instructions on the plugin page:
+    **https://github.com/imotov/elasticsearch-analysis-morphology#installation**
+
+2. Install the required [redmine_resque](https://github.com/Undev/redmine_resque plugin)
 
         cd YOUR_REDMINE_ROOT
         git clone https://github.com/Undev/redmine_resque.git plugins/redmine_resque
