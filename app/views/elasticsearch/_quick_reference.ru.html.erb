@@ -1,0 +1,41 @@
+<p>
+  В поле для поиска введите искомое слово, фразу или составьте поисковый запрос.
+  С помощью несложного синтаксиса можно построить запрос, который найдет иммено то что нужно.
+</p>
+
+<h3><a id="word"><%= l('es.word') %></a></h3>
+
+Для поиска можно ввести искомое слово полностью
+
+<p class="search-phrase">электричка</p>
+
+или его часть (начальную):
+
+<p class="search-phrase">электр</p>
+
+Поиск слова или его части по умолчанию осуществляется по следующим полям:
+
+<ul>
+  <li>title(<%= l(:field_title) %>)</li>
+  <li>description(<%= l(:field_description) %>)</li>
+  <li>notes(Описание обноления к задаче) - применимо только для задачи</li>
+</ul>
+
+<h3><a id="phrase"><%= l('es.phrase') %></a></h3>
+
+Для поиска фразы возьмите её в двойные ковычки:
+
+<p class="search-phrase">"скорый поезд"</p>
+
+<h3><a id="many_words"><%= l('es.many_words') %></a></h3>
+<h3><a id="wildcards"><%= l('es.wildcards') %></a></h3>
+<h3><a id="field"><%= l('es.field') %></a></h3>
+<h3><a id="regular_expression"><%= l('es.regular_expression') %></a></h3>
+<h3><a id="fuzziness"><%= l('es.fuzziness') %></a></h3>
+<h3><a id="proximity_searches"><%= l('es.proximity_searches') %></a></h3>
+<h3><a id="ranges"><%= l('es.ranges') %></a></h3>
+<h3><a id="boosting"><%= l('es.boosting') %></a></h3>
+<h3><a id="boolean_operators"><%= l('es.boolean_operators') %></a></h3>
+<h3><a id="grouping"><%= l('es.grouping') %></a></h3>
+<h3><a id="reserved_characters"><%= l('es.reserved_characters') %></a></h3>
+<h3><a id="empty_query"><%= l('es.empty_query') %></a></h3>

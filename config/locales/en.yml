@@ -2,6 +2,26 @@ en:
   search_request_failed: Search request to full text search engine failed.
   search_connection_refused: Connection to full text search engine refused.
 
+  label_search_quick_reference: Search Quick Reference
+  label_how_to_search: How to search
+
+  es:
+    word: Word
+    phrase: Phrase
+    many_words: Many words
+    wildcards: Wildcards
+    field: Search by field
+    regular_expression: Regular expression
+    fuzziness: Fuzziness
+    proximity_searches: Proximity searches
+    ranges: Ranges
+    boosting: Boosting
+    boolean_operators: Boolean operators
+    grouping: Grouping
+    reserved_characters: Reserved characters
+    empty_query: Empty query
+    available_fields: Available search fields
+
   views:
       pagination:
         first: "&laquo; First"

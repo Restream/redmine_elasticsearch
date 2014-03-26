@@ -1,0 +1,235 @@
+<p>
+  The query string “mini-language” is used by the Query String Query and by the q query string parameter in the search API.
+  The query string is parsed into a series of terms and operators. A term can be a single word — quick or brown — 
+  or a phrase, surrounded by double quotes — "quick brown" — which searches for all the words in the phrase, in the same order.
+  Operators allow you to customize the search — the available options are explained below.
+</p>
+
+<h3><a id="word"><%= l('es.word') %></a></h3>
+<h3><a id="phrase"><%= l('es.phrase') %></a></h3>
+<h3><a id="many_words"><%= l('es.many_words') %></a></h3>
+<h3><a id="wildcards"><%= l('es.wildcards') %></a></h3>
+
+  Wildcard searches can be run on individual terms, using '?' to replace a single character, and '*'
+  to replace zero or more characters:
+
+<p class="search-phrase">qu?ck bro*</p>
+
+  Be aware that wildcard queries can use an enormous amount of memory and perform very badly — just think how many terms
+  need to be queried to match the query string "a* b* c*".
+
+  <p>
+  Warning<br/>
+  Allowing a wildcard at the beginning of a word (eg "*ing") is particularly heavy, because all terms in the index need
+  to be examined, just in case they match.
+  </p>
+
+<h3><a id="field"><%= l('es.field') %></a></h3>
+  As mentioned above, the default_fields is searched for the search terms,
+  but it is possible to specify other fields in the query syntax:
+
+  <ul>
+    <li>
+      where the status field contains active
+      <p class="search-phrase">status:active</p>
+    </li>
+    <li>
+      where the title field contains quick or brown
+      <p class="search-phrase">title:(quick brown)</p>
+    </li>
+    <li>
+      where the author field contains the exact phrase "john smith"
+      <p class="search-phrase">author:"John Smith"</p>
+    </li>
+    <li>
+      where any of the fields book.title, book.content or book.date contains quick or brown (note how we need
+      to escape the * with a backslash):
+      <p class="search-phrase">book.\*:(quick brown)</p>
+    </li>
+    <li>
+      where the field title has no value (or is missing):
+      <p class="search-phrase">_missing_:title</p>
+    </li>
+    <li>
+      where the field title has any non-null value:
+      <p class="search-phrase">_exists_:title</p>
+    </li>
+  </ul>
+
+<h3><a id="regular_expression"><%= l('es.regular_expression') %></a></h3>
+
+  Regular expression patterns can be embedded in the query string by wrapping them in forward-slashes ("/"):
+
+  <p class="search-phrase">author:/joh?n(ath[oa]n)/</p>
+
+  The supported regular expression syntax is explained in Regular expression syntax.
+
+  <p>
+  Warning<br/>
+  A query string such as the following would force Elasticsearch to visit every term in the index:
+  </p>
+
+  <p class="search-phrase">/.*n/</p>
+
+  Use with caution!
+
+<h3><a id="fuzziness"><%= l('es.fuzziness') %></a></h3>
+
+  We can search for terms that are similar to, but not exactly like our search terms, using the “fuzzy” operator:
+
+  <p class="search-phrase">quikc~ brwn~ foks~</p>
+
+  This uses the Damerau-Levenshtein distance to find all terms with a maximum of two changes,
+  where a change is the insertion, deletion or substitution of a single character,
+  or transposition of two adjacent characters.
+
+  The default edit distance is 2, but an edit distance of 1 should be sufficient to catch 80% of all human misspellings.
+  It can be specified as:
+
+  <p class="search-phrase">quikc~1</p>
+
+<h3><a id="proximity_searches"><%= l('es.proximity_searches') %></a></h3>
+
+  While a phrase query (eg "john smith") expects all of the terms in exactly the same order, a proximity query allows the
+  specified words to be further apart or in a different order. In the same way that fuzzy queries can specify a maximum
+  edit distance for characters in a word, a proximity search allows us to specify a maximum edit distance
+  of words in a phrase:
+
+  <p class="search-phrase">"fox quick"~5</p>
+
+  The closer the text in a field is to the original order specified in the query string, the more relevant that document
+  is considered to be. When compared to the above example query, the phrase "quick fox" would be considered more
+  relevant than "quick brown fox".
+
+<h3><a id="ranges"><%= l('es.ranges') %></a></h3>
+
+  <p>
+    Ranges can be specified for date, numeric or string fields. Inclusive ranges are specified with square
+    brackets [min TO max] and exclusive ranges with curly brackets {min TO max}.
+  </p>
+
+  All days in 2012:
+
+  <p class="search-phrase">date:[2012/01/01 TO 2012/12/31]</p>
+
+  Numbers 1..5
+
+  <p class="search-phrase">count:[1 TO 5]</p>
+
+  Tags between alpha and omega, excluding alpha and omega:
+
+  tag:{alpha TO omega}
+  <p class="search-phrase">tags:{alpha TO omega}</p>
+
+  Numbers from 10 upwards
+
+  <p class="search-phrase">count:[10 TO *]</p>
+
+  Dates before 2012
+
+  <p class="search-phrase">date:{* TO 2012/01/01}</p>
+
+  Curly and square brackets can be combined:<br/>
+  Numbers from 1 up to but not including 5
+
+  <p class="search-phrase">count:[1..5}</p>
+
+  Ranges with one side unbounded can use the following syntax:
+
+  <p class="search-phrase">
+  age:>10<br/>
+  age:>=10<br/>
+  age:<10<br/>
+  age:<=10
+  </p>
+
+  Note
+  To combine an upper and lower bound with the simplified syntax, you would need to join two clauses with an AND operator:
+
+  <p class="search-phrase">
+  age:(>=10 AND < 20)<br/>
+  age:(+>=10 +<20)
+  </p>
+
+<h3><a id="boosting"><%= l('es.boosting') %></a></h3>
+  Use the boost operator ^ to make one term more relevant than another.
+  For instance, if we want to find all documents about foxes, but we are especially interested in quick foxes:
+
+  <p class="search-phrase">quick^2 fox</p>
+
+  The default boost value is 1, but can be any positive floating point number. Boosts between 0 and 1 reduce relevance.<br/>
+
+  Boosts can also be applied to phrases or to groups:
+  <p class="search-phrase">"john smith"^2 (foo bar)^4</p>
+
+<h3><a id="boolean_operators"><%= l('es.boolean_operators') %></a></h3>
+  <p>
+    By default, all terms are optional, as long as one term matches.
+    A search for foo bar baz will find any document that contains one or more of foo or bar or baz.
+    We have already discussed the default_operator above which allows you to force all terms to be required,
+    but there are also boolean operators which can be used in the query string itself to provide more control.
+  </p>
+  <p>
+    The preferred operators are + (this term must be present) and - (this term must not be present).
+    All other terms are optional. For example, this query:
+  </p>
+
+  <p class="search-phrase">quick brown +fox -news</p>
+
+  <p>
+  states that:<br/>
+
+  fox must be present<br/>
+  news must not be present<br/>
+  quick and brown are optional — their presence increases the relevance
+  </p>
+
+  <p>
+  The familiar operators AND, OR and NOT (also written &&, || and !) are also supported.
+  However, the effects of these operators can be more complicated than is obvious at first glance.
+  NOT takes precedence over AND, which takes precedence over OR.
+  While the + and - only affect the term to the right of the operator,
+  AND and OR can affect the terms to the left and right.
+  </p>
+
+<h3><a id="grouping"><%= l('es.grouping') %></a></h3>
+  Multiple terms or clauses can be grouped together with parentheses, to form sub-queries:
+
+  <p class="search-phrase">(quick OR brown) AND fox</p>
+
+  Groups can be used to target a particular field, or to boost the result of a sub-query:
+
+  <p class="search-phrase">status:(active OR pending) title:(full text search)^2</p>
+
+<h3><a id="reserved_characters"><%= l('es.reserved_characters') %></a></h3>
+<p class="search-phrase">fox</p>
+
+  <p>
+    If you need to use any of the characters which function as operators in your query itself (and not as operators),
+    then you should escape them with a leading backslash. For instance, to search for (1+1)=2, you would need
+    to write your query as \(1\+1\)=2.
+  </p>
+
+  <p>
+    The reserved characters are: + - && || ! ( ) { } [ ] ^ " ~ * ? : \ /
+  </p>
+
+  <p>
+    Failing to escape these special characters correctly could lead to a syntax error which prevents your query from running.
+  </p>
+
+  <p>
+    Watch this space<br/>
+    A space may also be a reserved character. For instance, if you have a synonym list which converts "wi fi" to "wifi",
+    a query_string search for "wi fi" would fail. The query string parser would interpret your query as a search for
+    "wi OR fi", while the token stored in your index is actually "wifi".
+    Escaping the space will protect it from being touched by the query string parser: "wi\ fi".
+  </p>
+
+
+<h3><a id="empty_query"><%= l('es.empty_query') %></a></h3>
+
+  <p>
+    If the query string is empty or only contains whitespaces the query string is interpreted as a no_docs_query
+    and will yield an empty result set.
+  </p>

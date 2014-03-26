@@ -3,8 +3,11 @@
 <div class="box">
   <%= form_tag({}, :method => :get) do %>
     <%= label_tag "search-input", l(:description_search), :class => "hidden-for-sighted" %>
-    <p><%= text_field_tag 'q', @question, :size => 60, :id => 'search-input' %>
+    <p><%= text_field_tag 'q', @question, :size => 120, :id => 'search-input' %>
       <%= javascript_tag "$('#search-input').focus()" %>
+      <%= link_to({ controller: 'elasticsearch', action: 'search_syntax' }, target: '_blank') do %>
+        <%= image_tag 'help.png' %>
+      <% end  %>
       <%= project_select_tag %>
       <%= hidden_field_tag 'all_words', '', :id => nil %>
       <label><%= check_box_tag 'all_words', 1, @all_words %> <%= l(:label_all_words) %></label>
