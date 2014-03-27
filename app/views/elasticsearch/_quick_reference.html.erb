@@ -6,8 +6,41 @@
 </p>
 
 <h3><a id="word"><%= l('es.word') %></a></h3>
+
+  For searching a word just type a whole word:
+
+  <p class="search-phrase">computer</p>
+
+  or its part (from begining):
+
+  <p class="search-phrase">comp</p>
+
+  By default search will be performed on these fields:
+
+  <ul>
+    <li>title(<%= l(:field_title) %>)</li>
+    <li>description(<%= l(:field_description) %>)</li>
+    <li>notes(Notes for Issue) - only for Issue</li>
+  </ul>
+
+  If you enable checkbox "Search titles only" then search
+  will be performed only fo field title(<%= l(:field_title) %>).
+
 <h3><a id="phrase"><%= l('es.phrase') %></a></h3>
+
+  Phrase, surrounded by double quotes — "quick brown" — whill searches
+  for all the words in the phrase, in the same order.
+
+  <p class="search-phrase">"quick brown"</p>
+
 <h3><a id="many_words"><%= l('es.many_words') %></a></h3>
+
+  For searching one of words:
+
+  <p class="search-phrase">fox brown bar</p>
+
+  For searching documents with all words you should enable "All words" checkbox.
+
 <h3><a id="wildcards"><%= l('es.wildcards') %></a></h3>
 
   Wildcard searches can be run on individual terms, using '?' to replace a single character, and '*'
@@ -30,8 +63,8 @@
 
   <ul>
     <li>
-      where the status field contains active
-      <p class="search-phrase">status:active</p>
+      where the status field is new
+      <p class="search-phrase">status:new</p>
     </li>
     <li>
       where the title field contains quick or brown
@@ -62,7 +95,7 @@
 
   <p class="search-phrase">author:/joh?n(ath[oa]n)/</p>
 
-  The supported regular expression syntax is explained in Regular expression syntax.
+  The supported regular expression syntax is explained in <a href="http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-regexp-query.html#regexp-syntax">Regular expression syntax</a>.
 
   <p>
   Warning<br/>
@@ -108,9 +141,9 @@
     brackets [min TO max] and exclusive ranges with curly brackets {min TO max}.
   </p>
 
-  All days in 2012:
+  All days in 2013:
 
-  <p class="search-phrase">date:[2012/01/01 TO 2012/12/31]</p>
+  <p class="search-phrase">datetime:[2013-01-01 TO 2013-12-31]</p>
 
   Numbers 1..5
 
@@ -118,7 +151,6 @@
 
   Tags between alpha and omega, excluding alpha and omega:
 
-  tag:{alpha TO omega}
   <p class="search-phrase">tags:{alpha TO omega}</p>
 
   Numbers from 10 upwards
@@ -127,7 +159,7 @@
 
   Dates before 2012
 
-  <p class="search-phrase">date:{* TO 2012/01/01}</p>
+  <p class="search-phrase">datetime:{* TO 2012-01-01}</p>
 
   Curly and square brackets can be combined:<br/>
   Numbers from 1 up to but not including 5
@@ -147,7 +179,7 @@
   To combine an upper and lower bound with the simplified syntax, you would need to join two clauses with an AND operator:
 
   <p class="search-phrase">
-  age:(>=10 AND < 20)<br/>
+  age:(>=10 AND <20)<br/>
   age:(+>=10 +<20)
   </p>
 
@@ -202,7 +234,6 @@
   <p class="search-phrase">status:(active OR pending) title:(full text search)^2</p>
 
 <h3><a id="reserved_characters"><%= l('es.reserved_characters') %></a></h3>
-<p class="search-phrase">fox</p>
 
   <p>
     If you need to use any of the characters which function as operators in your query itself (and not as operators),
@@ -217,15 +248,6 @@
   <p>
     Failing to escape these special characters correctly could lead to a syntax error which prevents your query from running.
   </p>
-
-  <p>
-    Watch this space<br/>
-    A space may also be a reserved character. For instance, if you have a synonym list which converts "wi fi" to "wifi",
-    a query_string search for "wi fi" would fail. The query string parser would interpret your query as a search for
-    "wi OR fi", while the token stored in your index is actually "wifi".
-    Escaping the space will protect it from being touched by the query string parser: "wi\ fi".
-  </p>
-
 
 <h3><a id="empty_query"><%= l('es.empty_query') %></a></h3>
 
