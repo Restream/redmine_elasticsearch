@@ -111,7 +111,7 @@ module RedmineElasticsearch::Patches::SearchControllerPatch
 
     search_fields = options[:titles_only] ? ['title'] : %w(title description notes)
     search_operator = options[:all_words] ? 'and' : 'or'
-    common_must << case options[:search_type]
+    main_query = case options[:search_type]
       when :query_string
         {
             query_string: {
@@ -133,6 +133,23 @@ module RedmineElasticsearch::Patches::SearchControllerPatch
       else
         raise "Unknown search_type: #{options[:search_type].inspect}"
     end
+
+    # add nested_query for searching in attachments
+    main_query = {
+        bool: {
+            should: [
+                main_query,
+                {
+                    nested: {
+                        path: 'attachments',
+                        query: main_query
+                    }
+                }
+            ]
+        }
+    } unless options[:titles_only]
+
+    common_must << main_query
 
     document_types = options[:scope].map(&:singularize)
     common_must << { terms: { _type: document_types} }
@@ -180,6 +197,7 @@ module RedmineElasticsearch::Patches::SearchControllerPatch
             { datetime: { order: 'desc' } },
             :_score
         ],
+        fields: ['_id'],
         facets: {
             types: {
                 terms: {
@@ -199,7 +217,8 @@ module RedmineElasticsearch::Patches::SearchControllerPatch
         payload: payload
     }
     search = Tire.search RedmineElasticsearch::INDEX_NAME, search_options
-    @query_curl = search.to_curl
+    @query_curl ||= []
+    @query_curl << search.to_curl
     search.results
   end
 

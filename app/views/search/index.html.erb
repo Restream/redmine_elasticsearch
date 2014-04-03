@@ -25,6 +25,11 @@
   <p>
     query took <%= @results.time %> ms, search type: <%= @search_type %>
   </p>
+  <% if Rails.env == 'development' %>
+    <% @query_curl.each do |query| %>
+      <p><%= query %></p>
+    <% end %>
+  <% end %>
 </div>
 
 <% unless @results.empty? %>

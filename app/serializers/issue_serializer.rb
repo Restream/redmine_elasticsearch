@@ -17,6 +17,7 @@ class IssueSerializer < BaseSerializer
              :closed
 
   has_many :journals, :serializer => JournalSerializer
+  has_many :attachments, :serializer => AttachmentSerializer
 
   def author
     object.author.try(:name)
