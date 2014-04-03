@@ -41,7 +41,7 @@ module ProjectSearch
           updated_on: { type: 'date' },
           custom_field_values: { type: 'string', index_name: 'cfv' },
           is_public: { type: 'boolean' }
-      }.merge(additional_index_mappings)
+      }.merge(additional_index_mappings).merge(nested_attachments_mappings)
     end
 
     def allowed_to_search_query(user, options = {})

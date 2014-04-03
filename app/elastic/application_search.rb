@@ -33,6 +33,50 @@ module ApplicationSearch
       }
     end
 
+    def nested_attachments_mappings
+      {
+          attachments: {
+              type: 'nested',
+              properties: {
+                  created_on: { type: 'date', index_name: 'datetime' },
+                  filename: { type: 'string', index_name: 'title',
+                              search_analyzer: 'search_analyzer',
+                              index_analyzer: 'index_analyzer' },
+                  description: { type: 'string',
+                                 search_analyzer: 'search_analyzer',
+                                 index_analyzer: 'index_analyzer' },
+                  author: { type: 'string' },
+
+                  filesize: { type: 'integer', index: 'not_analyzed' },
+                  container_type: { type: 'string', index: 'not_analyzed' },
+                  content_type: { type: 'string', index: 'not_analyzed' },
+                  digest: { type: 'string', index: 'not_analyzed' },
+                  downloads: { type: 'integer', index: 'not_analyzed' },
+                  author_id: { type: 'integer', index: 'not_analyzed' },
+
+                  file: {
+                      type: 'attachment',
+                      fields: {
+                          file: { store: 'yes',
+                                  search_analyzer: 'search_analyzer',
+                                  index_analyzer: 'index_analyzer' },
+                          title: { store: 'yes',
+                                   search_analyzer: 'search_analyzer',
+                                   index_analyzer: 'index_analyzer' },
+                          date: { store: 'yes' },
+                          author: { store: 'no' },
+                          keywords: { search_analyzer: 'search_analyzer',
+                                      index_analyzer: 'index_analyzer' },
+                          content_type: { store: 'no' },
+                          content_length: { store: 'no' },
+                          language: { store: 'no' }
+                      }
+                  }
+              }
+          }
+      }
+    end
+
     def additional_index_mappings
       return {} unless Rails.configuration.respond_to?(:additional_index_properties)
       Rails.configuration.additional_index_properties[self.name.tableize.to_sym] || {}

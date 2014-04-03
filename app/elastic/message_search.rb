@@ -35,7 +35,7 @@ module MessageSearch
 
           updated_on: { type: 'date' },
           replies_count: { type: 'integer', index: 'not_analyzed' }
-      }.merge(additional_index_mappings)
+      }.merge(additional_index_mappings).merge(nested_attachments_mappings)
     end
 
     def allowed_to_search_query(user, options = {})

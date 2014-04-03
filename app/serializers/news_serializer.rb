@@ -5,6 +5,8 @@ class NewsSerializer < BaseSerializer
              :author,
              :comments_count
 
+  has_many :attachments, :serializer => AttachmentSerializer
+
   def author
     object.author.try(:name)
   end
