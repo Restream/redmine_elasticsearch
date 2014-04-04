@@ -32,6 +32,7 @@ matrix:
 
 before_install:
   - export ES_HOME=/usr/share/elasticsearch
+  - curl -XGET 'http://localhost:9200'
   - sudo service elasticsearch stop
   - sudo $ES_HOME/bin/plugin -install elasticsearch/elasticsearch-mapper-attachments/2.0.0
   - sudo $ES_HOME/bin/plugin -install analysis-morphology -url http://dl.bintray.com/content/imotov/elasticsearch-plugins/org/elasticsearch/elasticsearch-analysis-morphology/1.2.0/elasticsearch-analysis-morphology-1.2.0.zip
