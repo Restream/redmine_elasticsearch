@@ -31,8 +31,10 @@ matrix:
 
 before_install:
   - export ES_HOME=/usr/share/elasticsearch
-  - sudo $ES_HOME/bin/plugin -install elasticsearch/elasticsearch-mapper-attachments/1.9.0
-  - sudo $ES_HOME/bin/plugin -install analysis-morphology -url http://dl.bintray.com/content/imotov/elasticsearch-plugins/org/elasticsearch/elasticsearch-analysis-morphology/1.2.0/elasticsearch-analysis-morphology-1.2.0.zip
+  - sudo wget https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.1.0.deb
+  - sudo service elasticsearch stop
+  - sudo dpkg -i elasticsearch-1.1.0.deb
+  - sudo $ES_HOME/bin/plugin -install elasticsearch/elasticsearch-mapper-attachments/2.0.0
   - sudo service elasticsearch start
   - sleep 3
   - export PLUGIN_NAME=redmine_elasticsearch
