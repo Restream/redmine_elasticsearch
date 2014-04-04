@@ -3,7 +3,6 @@ language: ruby
 services:
   - postgresql
   - redis-server
-  - elasticsearch
 
 rvm:
   - 1.9.3
@@ -32,12 +31,11 @@ matrix:
 
 before_install:
   - export ES_HOME=/usr/share/elasticsearch
-  - curl -XGET 'http://localhost:9200'
-  - sudo service elasticsearch stop
   - sudo $ES_HOME/bin/plugin -install elasticsearch/elasticsearch-mapper-attachments/2.0.0
   - sudo $ES_HOME/bin/plugin -install analysis-morphology -url http://dl.bintray.com/content/imotov/elasticsearch-plugins/org/elasticsearch/elasticsearch-analysis-morphology/1.2.0/elasticsearch-analysis-morphology-1.2.0.zip
   - sudo service elasticsearch start
   - sleep 3
+  - curl -XGET 'http://127.0.0.1:9200'
   - export PLUGIN_NAME=redmine_elasticsearch
   - export REDMINE_PATH=$HOME/redmine
   - svn co http://svn.redmine.org/redmine/tags/$REDMINE_VER $REDMINE_PATH
