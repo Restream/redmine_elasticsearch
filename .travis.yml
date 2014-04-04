@@ -31,7 +31,7 @@ matrix:
       gemfile: $REDMINE_PATH/Gemfile
 
 before_install:
-  - find / -name elasticsearch -type d
+  - find / -name plugin -type f
   - export ES_HOME=/opt/elasticsearch
   - $ES_HOME/bin/plugin -install elasticsearch/elasticsearch-mapper-attachments/2.0.0
   - export PLUGIN_NAME=redmine_elasticsearch
