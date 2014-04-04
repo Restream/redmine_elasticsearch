@@ -2,8 +2,11 @@ ru:
   search_request_failed: Поисковый запрос к сервису полнотекстового поиска не выполнен.
   search_connection_refused: Не удается подключиться к сервису полнотекстового поиска.
 
+  label_attachment_content: Содержимое файла
   label_search_quick_reference: Краткая справка по поиску
   label_how_to_search: Как искать?
+
+  field_digest: MD5 дайджест
 
   es:
     word: Слово
@@ -21,6 +24,7 @@ ru:
     reserved_characters: Зарезервированные символы
     empty_query: Пустой запрос
     available_fields: Доступные для поиска поля
+    attachments: Поиск по вложениям
 
   views:
     pagination:

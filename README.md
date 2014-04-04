@@ -100,36 +100,42 @@ For example this query will search issues with done_ratio from 0 to 50 and due_d
 
 1. Download and install [Elasticsearch](http://www.elasticsearch.org/overview/elkdownloads/)
 
-    Also you need to install [Morphological Analysis Plugin for ElasticSearch](https://github.com/imotov/elasticsearch-analysis-morphology)
+    There are required elasticsearch plugins that you should install:
 
-    Check installation instructions on the plugin page:
-    **https://github.com/imotov/elasticsearch-analysis-morphology#installation**
+    * [Morphological Analysis Plugin for ElasticSearch](https://github.com/imotov/elasticsearch-analysis-morphology)
+      Check installation instructions on the plugin page:
+      **https://github.com/imotov/elasticsearch-analysis-morphology#installation**
 
-2. Install the required [redmine_resque](https://github.com/Undev/redmine_resque plugin)
+    * [Mapper Attachments Type for Elasticsearch](https://github.com/elasticsearch/elasticsearch-mapper-attachments)
+      Check installation instructions on the plugin page:
+      **https://github.com/elasticsearch/elasticsearch-mapper-attachments**
+
+
+1. Install the required [redmine_resque](https://github.com/Undev/redmine_resque plugin)
 
         cd YOUR_REDMINE_ROOT
         git clone https://github.com/Undev/redmine_resque.git plugins/redmine_resque
 
-3. Install this plugin
+1. Install this plugin
 
         cd YOUR_REDMINE_ROOT
         git clone https://github.com/Undev/redmine_elasticsearch.git plugins/redmine_elasticsearch
 
-4. Install required gems
+1. Install required gems
 
         bundle install
 
-5. Reindex all documents with the following command
+1. Reindex all documents with the following command
 
         cd YOUR_REDMINE_ROOT
         bundle exec rake redmine_elasticsearch:reindex_all RAILS_ENV=production
 
-6. Start resque worker
+1. Start resque worker
 
         cd YOUR_REDMINE_ROOT
         bundle exec rake resque:work RAILS_ENV=production
 
-7. Restart Redmine
+1. Restart Redmine
 
 ## Configuration
 

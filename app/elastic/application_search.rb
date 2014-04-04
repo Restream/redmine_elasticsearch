@@ -48,8 +48,6 @@ module ApplicationSearch
                   author: { type: 'string' },
 
                   filesize: { type: 'integer', index: 'not_analyzed' },
-                  container_type: { type: 'string', index: 'not_analyzed' },
-                  content_type: { type: 'string', index: 'not_analyzed' },
                   digest: { type: 'string', index: 'not_analyzed' },
                   downloads: { type: 'integer', index: 'not_analyzed' },
                   author_id: { type: 'integer', index: 'not_analyzed' },
