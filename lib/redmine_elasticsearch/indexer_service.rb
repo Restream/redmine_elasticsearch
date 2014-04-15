@@ -42,7 +42,7 @@ module RedmineElasticsearch
 
       def update_search_klass_for_project(search_klass, parent_project, &block)
         project_id = parent_project.id
-        search_klass.searching_scope(project_id).find_in_batches do |batch|
+        search_klass.searching_scope(project_id).find_in_batches(:batch_size => 100) do |batch|
           search_klass.index.bulk :index, batch, parent: project_id, routing: ROUTE_KEY
           block.call(batch.length) if block_given?
         end
