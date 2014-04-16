@@ -7,21 +7,26 @@ module RedmineElasticsearch
     ROUTE_KEY = 'abc'
 
     class << self
-      def reindex_all(&block)
+      def recreate_index
+        delete_index if index_exists?
+        create_index
+        update_mapping
+      end
+
+      def reindex_all(options = {}, &block)
         recreate_index
-        update_mapping(&block)
         for_each_parent_project do |parent_project|
           search_klasses.each do |search_klass|
-            update_search_klass_for_project(search_klass, parent_project, &block)
+            update_search_klass_for_project(search_klass, parent_project, options, &block)
           end
         end
       end
 
-      def reindex(search_type, &block)
+      def reindex(search_type, options = {}, &block)
         search_klass = find_search_klass(search_type)
         create_index unless index_exists?
         for_each_parent_project do |parent_project|
-          update_search_klass_for_project(search_klass, parent_project, &block)
+          update_search_klass_for_project(search_klass, parent_project, options, &block)
         end
       end
 
@@ -40,9 +45,10 @@ module RedmineElasticsearch
         ParentProject.index.refresh
       end
 
-      def update_search_klass_for_project(search_klass, parent_project, &block)
+      def update_search_klass_for_project(search_klass, parent_project, options, &block)
         project_id = parent_project.id
-        search_klass.searching_scope(project_id).find_in_batches(:batch_size => 100) do |batch|
+        batch_size = options[:batch_size] || 300
+        search_klass.searching_scope(project_id).find_in_batches(batch_size: batch_size) do |batch|
           search_klass.index.bulk :index, batch, parent: project_id, routing: ROUTE_KEY
           block.call(batch.length) if block_given?
         end
@@ -50,11 +56,6 @@ module RedmineElasticsearch
 
       def update_mapping
         search_klasses.each { |search_klass| search_klass.update_mapping }
-      end
-
-      def recreate_index
-        delete_index if index_exists?
-        create_index
       end
 
       def index_exists?
