@@ -55,13 +55,13 @@ module ApplicationSearch
                   file: {
                       type: 'attachment',
                       fields: {
-                          file: { store: 'yes',
+                          file: { store: 'no',
                                   search_analyzer: 'search_analyzer',
                                   index_analyzer: 'index_analyzer' },
-                          title: { store: 'yes',
+                          title: { store: 'no',
                                    search_analyzer: 'search_analyzer',
                                    index_analyzer: 'index_analyzer' },
-                          date: { store: 'yes' },
+                          date: { store: 'no' },
                           author: { store: 'no' },
                           keywords: { search_analyzer: 'search_analyzer',
                                       index_analyzer: 'index_analyzer' },

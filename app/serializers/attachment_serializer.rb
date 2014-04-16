@@ -1,6 +1,8 @@
 class AttachmentSerializer < ActiveModel::Serializer
   self.root = false
 
+  MAX_SIZE = 1.megabyte
+
   attributes :created_on,
              :filename,
              :description,
@@ -17,6 +19,6 @@ class AttachmentSerializer < ActiveModel::Serializer
   end
 
   def file
-    Base64.encode64(File.read(object.diskfile)) if object.readable?
+    Base64.encode64(File.read(object.diskfile, MAX_SIZE)) if object.readable?
   end
 end
