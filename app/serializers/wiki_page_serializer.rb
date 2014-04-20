@@ -12,4 +12,8 @@ class WikiPageSerializer < BaseSerializer
   def author
     nil
   end
+
+  def attachments
+    object.attachments.find_all { |attachment| AttachmentSerializer.supported?(attachment) }
+  end
 end

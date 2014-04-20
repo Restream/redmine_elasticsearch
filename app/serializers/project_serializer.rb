@@ -16,4 +16,8 @@ class ProjectSerializer < BaseSerializer
   def _parent
     object.id
   end
+
+  def attachments
+    object.attachments.find_all { |attachment| AttachmentSerializer.supported?(attachment) }
+  end
 end

@@ -10,4 +10,8 @@ class NewsSerializer < BaseSerializer
   def author
     object.author.try(:name)
   end
+
+  def attachments
+    object.attachments.find_all { |attachment| AttachmentSerializer.supported?(attachment) }
+  end
 end
