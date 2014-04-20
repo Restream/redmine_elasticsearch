@@ -5,6 +5,10 @@ class AttachmentSerializer < ActiveModel::Serializer
 
   MAX_SIZE = 5.megabytes
 
+  SUPPORTED_EXTENSIONS = %w{
+    .doc .docx .htm .html .json .ods .odt .pdf .ppt .pptx .rb .rtf .sh .sql .txt .xls .xlsx .xml .yaml .yml
+  }
+
   SUPPORTED_MIME_PATTERNS = %w{
     application\/json
     application\/msword
@@ -54,8 +58,12 @@ class AttachmentSerializer < ActiveModel::Serializer
   def supported?
     object.filesize > 0 &&
         object.filesize < MAX_SIZE &&
-        content_type_supported? &&
+        (extension_supported? || content_type_supported?) &&
         object.readable?
+  end
+
+  def extension_supported?
+    SUPPORTED_EXTENSIONS.include?($1) if object.filename =~ /(\.[^\.]+)$/
   end
 
   def content_type_supported?
