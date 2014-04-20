@@ -1,7 +1,9 @@
 class AttachmentSerializer < ActiveModel::Serializer
   self.root = false
 
-  MAX_SIZE = 1.megabyte
+  # todo: move max_size and supported_mime_patterns and unsupported phrase to plugin configuration
+
+  MAX_SIZE = 5.megabytes
 
   SUPPORTED_MIME_PATTERNS = %w{
     application\/json
@@ -25,6 +27,8 @@ class AttachmentSerializer < ActiveModel::Serializer
     text\/
   }
 
+  UNSUPPORTED = 'unsupported'
+
   attributes :created_on,
              :filename,
              :description,
@@ -36,24 +40,25 @@ class AttachmentSerializer < ActiveModel::Serializer
              :content_type,
              :file
 
-  class << self
-    def supported?(object)
-      content_type_supported?(object.content_type) &&
-          object.filesize > 0 &&
-          object.filesize < MAX_SIZE &&
-          object.readable?
-    end
-
-    def content_type_supported?(content_type)
-      SUPPORTED_MIME_PATTERNS.any? { |pattern| content_type =~ Regexp.new(pattern, true) }
-    end
-  end
-
   def author
     object.author && object.author.to_s
   end
 
   def file
-    Base64.encode64(File.read(object.diskfile))
+    content = supported? ? File.read(object.diskfile) : UNSUPPORTED
+    Base64.encode64(content)
+  end
+
+  private
+
+  def supported?
+    object.filesize > 0 &&
+        object.filesize < MAX_SIZE &&
+        content_type_supported? &&
+        object.readable?
+  end
+
+  def content_type_supported?
+    SUPPORTED_MIME_PATTERNS.any? { |pattern| object.content_type =~ Regexp.new(pattern, true) }
   end
 end

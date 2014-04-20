@@ -9,8 +9,4 @@ class DocumentSerializer < BaseSerializer
   def category
     object.category.try(:name)
   end
-
-  def attachments
-    object.attachments.find_all { |attachment| AttachmentSerializer.supported?(attachment) }
-  end
 end

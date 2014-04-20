@@ -59,8 +59,4 @@ class IssueSerializer < BaseSerializer
   def closed
     object.closed?
   end
-
-  def attachments
-    object.attachments.find_all { |attachment| AttachmentSerializer.supported?(attachment) }
-  end
 end
