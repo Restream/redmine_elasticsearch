@@ -38,6 +38,6 @@ namespace :redmine_elasticsearch do
   end
 
   def batch_size
-    ENV['BATCH_SIZE'].present? ? ENV['BATCH_SIZE'].to_i : nil
+    ENV['BATCH_SIZE'].present? ? ENV['BATCH_SIZE'].to_i : 1
   end
 end
