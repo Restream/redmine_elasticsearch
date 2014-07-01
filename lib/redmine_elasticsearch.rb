@@ -2,6 +2,8 @@ module RedmineElasticsearch
   INDEX_NAME = "#{Rails.application.class.parent_name.downcase}_#{Rails.env}"
 end
 
+Tire::Configuration.url(Redmine::Configuration['elasticsearch_url'])
+
 %w{elastic serializers}.each do |fold|
   fold_path = File.dirname(__FILE__) + "/../app/#{fold}"
   ActiveSupport::Dependencies.autoload_paths += [fold_path]
