@@ -49,6 +49,9 @@ module RedmineElasticsearch::Patches::SearchControllerPatch
   rescue Errno::ECONNREFUSED => e
     logger.error e
     render_error :message => :search_connection_refused, :status => 503
+  rescue Tire::Search::SearchRequestFailed => e
+    logger.error e
+    render_error :message => :search_request_failed, :status => 503
   end
 
   private
