@@ -13,7 +13,10 @@ module Workers
           params = { type: object_or_class.name }
           self.perform_async(params)
         elsif object_or_class.id?
-          params = { id: object_or_class.id, type: object_or_class.class.name }
+          params = {
+              id: object_or_class.id,
+              type: object_or_class.event_type
+          }
           self.perform_async(params)
         end
       rescue Exception => e
@@ -26,7 +29,7 @@ module Workers
       end
 
       def perform(options)
-        id, type = options['id'], options['type']
+        id, type = options.with_indifferent_access[:id], options.with_indifferent_access[:type]
         id.nil? ? update_class_index(type) : update_instance_index(type, id)
       end
 
@@ -43,6 +46,7 @@ module Workers
         document.update_index
       rescue ActiveRecord::RecordNotFound
         klass.index.remove type, id
+        klass.index.update_index
       rescue ::RestClient::Exception, Errno::ECONNREFUSED => e
         raise IndexError, e, e.backtrace
       end
