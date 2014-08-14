@@ -16,8 +16,12 @@ class BaseSerializer < ActiveModel::Serializer
     route_key
   end
 
-  %w(datetime title description type).each do |attr|
+  %w(datetime title description).each do |attr|
     class_eval "def #{attr}() object.event_#{attr} end"
+  end
+
+  def type
+    object.class.index_document_type
   end
 
   def author

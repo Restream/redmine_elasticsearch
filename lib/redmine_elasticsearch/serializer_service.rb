@@ -18,7 +18,7 @@ class RedmineElasticsearch::SerializerService
     end
 
     def build_serializer_klass(object_type)
-      parent = "#{object_type.to_s.classify}Serializer".safe_constantize || BaseSerializer
+      parent = "#{RedmineElasticsearch.type2class_name(object_type)}Serializer".safe_constantize || BaseSerializer
       serializer_klass = Class.new(parent)
       additional_props = additional_index_properties(object_type)
       add_additional_properties(serializer_klass, additional_props) if additional_props

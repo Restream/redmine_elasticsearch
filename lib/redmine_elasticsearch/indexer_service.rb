@@ -73,12 +73,12 @@ module RedmineElasticsearch
       end
 
       def search_klasses
-        Redmine::Search.available_search_types.map { |type| type.to_s.classify.constantize }
+        Redmine::Search.available_search_types.map { |type| RedmineElasticsearch.type2class(type) }
       end
 
       def find_search_klass(search_type)
         validate_search_type(search_type)
-        search_type.to_s.classify.constantize
+        RedmineElasticsearch.type2class(search_type)
       end
 
       def validate_search_type(search_type)

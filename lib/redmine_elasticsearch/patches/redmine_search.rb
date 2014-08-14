@@ -25,14 +25,14 @@ module RedmineElasticsearch::Patches::RedmineSearch
     private
 
     def include_search_methods(search_type)
-      search_klass = search_type.to_s.classify.constantize
+      search_klass = RedmineElasticsearch.type2class(search_type)
       include_methods(search_klass, ::ApplicationSearch)
       explicit_search_methods = detect_search_methods(search_type)
       include_methods(search_klass, explicit_search_methods) if explicit_search_methods
     end
 
     def detect_search_methods(search_type)
-      "::#{search_type.to_s.classify}Search".safe_constantize
+      "::#{RedmineElasticsearch.type2class_name(search_type)}Search".safe_constantize
     end
 
     def include_methods(klass, methods)

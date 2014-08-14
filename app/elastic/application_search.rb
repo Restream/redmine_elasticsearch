@@ -19,6 +19,10 @@ module ApplicationSearch
 
   module ClassMethods
 
+    def index_document_type
+      self.name.underscore
+    end
+
     def index_mappings
       {
           document_type => {
