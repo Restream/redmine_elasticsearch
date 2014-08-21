@@ -46,7 +46,7 @@ module Workers
         document.update_index
       rescue ActiveRecord::RecordNotFound
         klass.index.remove type, id
-        klass.index.update_index
+        klass.index.refresh
       rescue ::RestClient::Exception, Errno::ECONNREFUSED => e
         raise IndexError, e, e.backtrace
       end
