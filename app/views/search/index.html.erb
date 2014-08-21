@@ -22,10 +22,10 @@
 
     <p><%= submit_tag l(:button_submit), :name => 'submit' %></p>
   <% end %>
-  <p>
-    query took <%= @results.time %> ms, search type: <%= @search_type %>
-  </p>
   <% if Rails.env == 'development' %>
+    <p>
+      Query took <%= @results.time %> ms, search type: <%= @search_type %>
+    </p>
     <% @query_curl.each do |query| %>
       <p><%= query %></p>
     <% end %>
