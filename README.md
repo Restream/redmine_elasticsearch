@@ -128,7 +128,9 @@ For example this query will search issues with done_ratio from 0 to 50 and due_d
 1. Reindex all documents with the following command
 
         cd YOUR_REDMINE_ROOT
-        bundle exec rake redmine_elasticsearch:reindex_all RAILS_ENV=production
+        bundle exec rake redmine_elasticsearch:reindex_all BATCH_SIZE=100 RAILS_ENV=production
+
+    Please be patient. It's can take a long time.
 
 1. Start resque worker
 
