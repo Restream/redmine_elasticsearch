@@ -37,6 +37,10 @@ module RedmineElasticsearch
 
       protected
 
+      def logger
+        ActiveRecord::Base.logger
+      end
+
       def for_each_parent_project(&block)
         ParentProject.searching_scope.find_each do |parent_project|
           parent_project.update_index
@@ -52,6 +56,8 @@ module RedmineElasticsearch
           search_klass.index.bulk :index, batch, parent: project_id, routing: ROUTE_KEY
           block.call(batch.length) if block_given?
         end
+      rescue StandardError => err
+        logger.error "!!! Error while updating index for '#{search_klass.name}': #{err.message}"
       end
 
       def update_mapping

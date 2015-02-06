@@ -3,14 +3,14 @@ require 'ansi/progressbar'
 namespace :redmine_elasticsearch do
 
   desc 'Recreate index'
-  task :recreate_index => :environment do
+  task :recreate_index => :logged do
     puts 'Recreate index for all available search types'
     RedmineElasticsearch::IndexerService.recreate_index
     puts 'Done recreating index.'
   end
 
   desc 'Recreate index and reindex all available search types (BATCH_SIZE env variable is optional)'
-  task :reindex_all => :environment do
+  task :reindex_all => :logged do
     puts 'Recreate index for all available search types'
     estimated_records = RedmineElasticsearch::IndexerService.count_estimated_records
     bar = ANSI::ProgressBar.new('Projects', estimated_records)
@@ -23,7 +23,7 @@ namespace :redmine_elasticsearch do
   end
 
   desc 'Reindex search type (NAME env variable is required, BATCH_SIZE is optional)'
-  task :reindex => :environment do
+  task :reindex => :logged do
     search_type = ENV['NAME']
     raise 'Specify search type in NAME env variable' if search_type.blank?
     puts "Reindexing #{search_type} type"
@@ -35,6 +35,12 @@ namespace :redmine_elasticsearch do
     end
     bar.finish
     puts "Done reindex #{search_type}."
+  end
+
+  task :logged => :environment do
+    logger = Logger.new(STDOUT)
+    logger.level = Logger::WARN
+    ActiveRecord::Base.logger = logger
   end
 
   def batch_size
