@@ -86,7 +86,7 @@ By default, search is performed in the following fields:
 * Description
 * Notes (only for issues)
 
-If you enable the **Search titles only** check box, search will be performed only in the ** Subject**/**Title** field.
+If you enable the **Search titles only** check box, search will be performed only in the **Subject** / **Title** field.
 
 To perform search in other fields, you can specify the field name and its value in the query string in the following format: `field:value`.
 
