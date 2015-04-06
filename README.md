@@ -65,19 +65,17 @@ By default, only regular fields are indexed. To index custom fields, you should 
         }
     }
 
-You can explicitly specify the elasticsearch cluster by setting the ELASTICSEARCH_URL environment variable.
+You can explicitly specify the elasticsearch cluster by setting the **ELASTICSEARCH_URL** environment variable.
 
 ## Usage
 
 The plugin enables full-text search capabilities in Redmine.
 
-Search is performed using a query string, which is parsed into a series of terms and operators. 
+Search is performed using a query string, which is parsed into a series of terms and operators. A term can be a single word (*another* or *issue*) or a phrase (*another issue*). Operators allow you to customize your search. 
 
-A term can be a single word (*another* or *issue*) or a phrase (*another issue*). 
+For more information about the query string syntax, see [Elasticsearch Reference]( http://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html#query-string-syntax).
 
-Operators allow you to customize your search. For more information about the query string syntax, see [Elasticsearch Reference]( http://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html#query-string-syntax).
-
-Search and result counting are performed according to the current user permissions.
+The search results are counted and displayed according to the current user permissions.
 
 You can search for one word by typing the word or its initial part in the **Search** box. If you type several words, the search results will show pages that contain at least one of these words. To search for all words, enable the **All words** check box. If you want to search for the exact phrase, surround it by double quotes (*"another issue"*).  
 ![search options](elasticsearch_1.PNG)
@@ -88,9 +86,9 @@ By default, search is performed in the following fields:
 * Description
 * Notes (only for issues)
 
-If you enable the **Search titles only** check box, search will be performed only in the ** Subject/Title** field.
+If you enable the **Search titles only** check box, search will be performed only in the ** Subject**/**Title** field.
 
-To search in other fields, you can specify the field name and its value in the query string in the following format: `field:value`.
+To perform search in other fields, you can specify the field name and its value in the query string in the following format: `field:value`.
 
 The table below lists the fields that can be searched, and the corresponding Redmine field names. Alternative field names are preceded with a tilde ('~').
 
@@ -98,11 +96,11 @@ The table below lists the fields that can be searched, and the corresponding Red
 
 | Query string field | Redmine field name |
 |--------------------|------------------- |
-| subject ~ title | Subject |
+| subject   ~ title | Subject |
 | description | Description |
 | author | Author |
 | category | Category |
-| created_on ~ datetime | Created |
+| created_on   ~ datetime | Created |
 | updated_on | Updated |
 | closed_on | Closed |
 | due_date | Due date |
@@ -110,10 +108,10 @@ The table below lists the fields that can be searched, and the corresponding Red
 | status | Status |
 | priority | Priority |
 | done_ratio | % Done |
-| custom_field_values ~ cfv | Custom fields |
-| fixed_version ~ version | Target version |
-| is_private ~ private | Private |
-| is_closed ~ closed | Issue closed |
+| custom_field_values   ~ cfv | Custom fields |
+| fixed_version   ~ version | Target version |
+| is_private   ~ private | Private |
+| is_closed   ~ closed | Issue closed |
 | journals.notes | Notes |
 | url | URL |
 
@@ -127,17 +125,17 @@ For example this query will search issues with done_ratio from 0 to 50 and due_d
 
 | Query string field | Redmine field name |
 |--------------------|------------------- |
-| name ~ title | Name |
+| name   ~ title | Name |
 | description | Description |
 | author | Author |
-| created_on ~ datetime | Created |
+| created_on   ~ datetime | Created |
 | updated_on | Updated |
 | homepage | Homepage |
 | due_date | Due date |
 | url | URL |
 | identifier | Identifier |
-| custom_field_values ~ cfv | Custom fields |
-| is_public ~ public | Public |
+| custom_field_values   ~ cfv | Custom fields |
+| is_public   ~ public | Public |
 
 ### Changesets
 
@@ -145,8 +143,8 @@ For example this query will search issues with done_ratio from 0 to 50 and due_d
 |--------------------|------------------- |
 | title | Title |
 | comments | Comment |
-| committer ~ author | Author |
-| committed_on ~ datetime | Created |
+| committer   ~ author | Author |
+| committed_on   ~ datetime | Created |
 | url | URL |
 | revision | Revision |
 
@@ -157,7 +155,7 @@ For example this query will search issues with done_ratio from 0 to 50 and due_d
 | title | Title |
 | description | Description |
 | author | Author |
-| created_on ~ datetime | Created |
+| created_on   ~ datetime | Created |
 | url | URL |
 | summary | Summary |
 | comments_count | Comments |
@@ -166,10 +164,10 @@ For example this query will search issues with done_ratio from 0 to 50 and due_d
 
 | Query string field | Redmine field name |
 |--------------------|------------------- |
-| subject ~ title | Subject |
-| content ~ description | Content |
+| subject   ~ title | Subject |
+| content   ~ description | Content |
 | author | Author |
-| created_on ~ datetime | Created |
+| created_on   ~ datetime | Created |
 | updated_on | Updated |
 | replies_count | Replies|
 | url | URL |
@@ -179,9 +177,9 @@ For example this query will search issues with done_ratio from 0 to 50 and due_d
 | Query string field | Redmine field name |
 |--------------------|------------------- |
 | title | Title |
-| text ~ description | Text |
+| text   ~ description | Text |
 | author | Author |
-| created_on ~ datetime | Created |
+| created_on   ~ datetime | Created |
 | updated_on | Updated |
 | url | URL |
 
@@ -192,7 +190,7 @@ For example this query will search issues with done_ratio from 0 to 50 and due_d
 | title | Title |
 | description | Description |
 | author | Author |
-| created_on ~ datetime | Created |
+| created_on   ~ datetime | Created |
 | url | URL |
 | category | Category |
 
@@ -209,7 +207,7 @@ For example this query will search issues with done_ratio from 0 to 50 and due_d
 | attachments.downloads | D/L |
 | attachments.file | Attachment content |
 
-You can search for issues, projects, news, documents, wiki pages and messages by attachments. For example, to search for a container with the attachment filename "somefile.pdf", use the following syntax:
+You can search for issues, projects, news, documents, wiki pages and messages by attachments. For example, to limit the search scope to containers with the **somefile.pdf** attachment filename, use the following syntax:
 
     attachments.filename:somefile.pdf
 
