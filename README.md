@@ -1,148 +1,63 @@
-# Full text searching plugin for Redmine
+# Redmine Elasticsearch Plugin
 
 [![Build Status](https://travis-ci.org/Undev/redmine_elasticsearch.png?branch=master)](https://travis-ci.org/Undev/redmine_elasticsearch)
 [![Code Climate](https://codeclimate.com/github/Undev/redmine_elasticsearch.png)](https://codeclimate.com/github/Undev/redmine_elasticsearch)
 
-This plugin integrates elasticsearch into Redmine
+This plugin integrates the Elasticsearch<sup>®</sup> full-text search engine into Redmine.
 
-## Description
+Elasticsearch is a trademark of Elasticsearch BV, registered in the U.S. and in other countries.
 
-The query string is parsed into a series of terms and operators.
-A term can be a single word *quick* or *brown* or a phrase, surrounded by double quotes *"quick brown"* 
-which searches for all the words in the phrase, in the same order.
-Operators allow you to customize the search. More detailed query syntax here: http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html
+## Compatibility
 
-Search and counting of results is made with regard to the rights of the current user.
+This plugin version is compatible only with Redmine 2.1.x and later.
 
-Below is a list of fields that can be searched.
+## Installation
 
-### Issues
+1. This plugin requires [Redmine Resque Plugin](https://github.com/Undev/redmine_resque). Install the plugin, but do not start a Resque worker for now.
 
-* subject ~ title
-* description
-* author
-* category
-* created_on ~ datetime (for redmine 2.3.0 and higher)
-* updated_on
-* closed_on
-* due_date
-* assigned_to
-* category
-* status
-* priority
-* done_ratio
-* custom_field_values
-* fixed_version ~ version
-* is_private ~ private
-* is_closed ~ closed
-* journals.notes
+2. Download and install [Elasticsearch](http://www.elasticsearch.org/overview/elkdownloads/).
 
-*'subject ~ title' means that you can use 'subject' or 'title' in query*
-
-For example this query will search issues with done_ratio from 0 to 50 and due_date before april 2014:
-
-    done_ratio:[0 50] AND due_date:[* 2014-04]
-
-### Changesets
-
-* committed_on ~ datetime
-* title
-* comments ~ description
-* committer ~ author
-
-### Documents
-
-* created_on ~ datetime
-* title
-* description
-* author
-* category
-
-### Forum messages
-
-* created_on ~ datetime
-* subject ~ title
-* content ~ description
-* author
-* updated_on
-* replies_count
-
-### Projects
-
-* created_on ~ datetime
-* name ~ title
-* description
-* author
-* updated_on
-* homepage
-* identifier
-* custom_field_values
-* is_public
-
-### Wiki pages
-
-* created_on ~ datetime
-* title
-* text ~ description
-* author
-* updated_on
-
-### News
-
-* created_on ~ datetime
-* title
-* description
-* author
-* summary
-* comments_count
-
-## Install
-
-1. Download and install [Elasticsearch](http://www.elasticsearch.org/overview/elkdownloads/)
-
-    There are required elasticsearch plugins that you should install:
+3. Install other required plugins:
 
     * [Morphological Analysis Plugin for ElasticSearch](https://github.com/imotov/elasticsearch-analysis-morphology)
-      Check installation instructions on the plugin page:
-      **https://github.com/imotov/elasticsearch-analysis-morphology#installation**
 
     * [Mapper Attachments Type for Elasticsearch](https://github.com/elasticsearch/elasticsearch-mapper-attachments)
-      Check installation instructions on the plugin page:
-      **https://github.com/elasticsearch/elasticsearch-mapper-attachments**
 
+4. To install Redmine Elasticsearch Plugin,
 
-1. Install the required [redmine_resque](https://github.com/Undev/redmine_resque plugin)
+    * Download the .ZIP archive, extract files and copy the plugin directory into #{REDMINE_ROOT}/plugins.
+    
+    Or
 
-        cd YOUR_REDMINE_ROOT
-        git clone https://github.com/Undev/redmine_resque.git plugins/redmine_resque
+    * Change you current directory to your Redmine root directory:  
 
-1. Install this plugin
+            cd {REDMINE_ROOT}
+            
+      Copy the plugin from GitHub using the following commands:
+      
+            git clone https://github.com/Undev/redmine_elasticsearch.git plugins/redmine_elasticsearch
 
-        cd YOUR_REDMINE_ROOT
-        git clone https://github.com/Undev/redmine_elasticsearch.git plugins/redmine_elasticsearch
-
-1. Install required gems
+5. Install the required gems:
 
         bundle install
 
-1. Reindex all documents with the following command
+6. Reindex all documents using the following command:
+
+        cd {REDMINE_ROOT}
+        bundle exec rake redmine_elasticsearch:reindex_all RAILS_ENV=production
+
+7. Start a Resque worker (as described in [Redmine Resque Plugin](https://github.com/Undev/redmine_resque) installation instructions).
 
         cd YOUR_REDMINE_ROOT
-        bundle exec rake redmine_elasticsearch:reindex_all BATCH_SIZE=100 RAILS_ENV=production
+        bundle exec rake resque:work RAILS_ENV=production QUEUE=*
 
-    Please be patient. It's can take a long time.
+8. Restart Redmine
 
-1. Start resque worker
-
-        cd YOUR_REDMINE_ROOT
-        bundle exec rake resque:work RAILS_ENV=production
-
-1. Restart Redmine
+Now you should be able to see the plugin in **Administration > Plugins**. 
 
 ## Configuration
 
-You can add additional index options to config/additional_environment.rb.
-For example:
+By default, only regular fields are indexed. To index custom fields, you should add them to **config/additional_environment.rb**. For example, to enable indexing of issue tags, add the following code:
 
     config.additional_index_properties = {
         :issues => {
@@ -150,24 +65,168 @@ For example:
         }
     }
 
-All this options will be joined to index settings.
+You can explicitly specify the elasticsearch cluster by setting the **ELASTICSEARCH_URL** environment variable.
 
-You can explicit set elasticsearch node by setting ELASTICSEARCH_URL environment variable.
+## Usage
 
-## Links
+The plugin enables full-text search capabilities in Redmine.
 
-- http://www.redmine.org/
-- https://github.com/karmi/retire
-- http://www.elasticsearch.org/
+Search is performed using a query string, which is parsed into a series of terms and operators. A term can be a single word (*another* or *issue*) or a phrase (*another issue*). Operators allow you to customize your search. 
+
+For more information about the query string syntax, see [Elasticsearch Reference]( http://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html#query-string-syntax).
+
+The search results are counted and displayed according to the current user permissions.
+
+You can search for one word by typing the word or its initial part in the **Search** box. If you type several words, the search results will show pages that contain at least one of these words. To search for all words, enable the **All words** check box. If you want to search for the exact phrase, surround it by double quotes (*"another issue"*).  
+![search options](elasticsearch_1.PNG)
+
+By default, search is performed in the following fields:
+
+* Subject or Title
+* Description
+* Notes (only for issues)
+
+If you enable the **Search titles only** check box, search will be performed only in the **Subject** / **Title** field.
+
+To perform search in other fields, you can specify the field name and its value in the query string in the following format: `field:value`.
+
+The table below lists the fields that can be searched, and the corresponding Redmine field names. Alternative field names are preceded with a tilde ('~').
+
+### Issues
+
+| Query string field | Redmine field name |
+|--------------------|------------------- |
+| subject   ~ title | Subject |
+| description | Description |
+| author | Author |
+| category | Category |
+| created_on   ~ datetime | Created |
+| updated_on | Updated |
+| closed_on | Closed |
+| due_date | Due date |
+| assigned_to | Assignee |
+| status | Status |
+| priority | Priority |
+| done_ratio | % Done |
+| custom_field_values   ~ cfv | Custom fields |
+| fixed_version   ~ version | Target version |
+| is_private   ~ private | Private |
+| is_closed   ~ closed | Issue closed |
+| journals.notes | Notes |
+| url | URL |
+
+*Note that 'subject ~ title' means that you can use 'subject' or 'title' in a query*
+
+For example this query will search issues with done_ratio from 0 to 50 and due_date before April 2015:
+
+    done_ratio:[0 50] AND due_date:[* 2015-04]
+
+### Projects
+
+| Query string field | Redmine field name |
+|--------------------|------------------- |
+| name   ~ title | Name |
+| description | Description |
+| author | Author |
+| created_on   ~ datetime | Created |
+| updated_on | Updated |
+| homepage | Homepage |
+| due_date | Due date |
+| url | URL |
+| identifier | Identifier |
+| custom_field_values   ~ cfv | Custom fields |
+| is_public   ~ public | Public |
+
+### Changesets
+
+| Query string field | Redmine field name |
+|--------------------|------------------- |
+| title | Title |
+| comments | Comment |
+| committer   ~ author | Author |
+| committed_on   ~ datetime | Created |
+| url | URL |
+| revision | Revision |
+
+### News
+
+| Query string field | Redmine field name |
+|--------------------|------------------- |
+| title | Title |
+| description | Description |
+| author | Author |
+| created_on   ~ datetime | Created |
+| url | URL |
+| summary | Summary |
+| comments_count | Comments |
+
+### Messages
+
+| Query string field | Redmine field name |
+|--------------------|------------------- |
+| subject   ~ title | Subject |
+| content   ~ description | Content |
+| author | Author |
+| created_on   ~ datetime | Created |
+| updated_on | Updated |
+| replies_count | Replies|
+| url | URL |
+
+### Wiki pages
+
+| Query string field | Redmine field name |
+|--------------------|------------------- |
+| title | Title |
+| text   ~ description | Text |
+| author | Author |
+| created_on   ~ datetime | Created |
+| updated_on | Updated |
+| url | URL |
+
+### Documents
+
+| Query string field | Redmine field name |
+|--------------------|------------------- |
+| title | Title |
+| description | Description |
+| author | Author |
+| created_on   ~ datetime | Created |
+| url | URL |
+| category | Category |
+
+### Files
+
+| Query string field | Redmine field name |
+|--------------------|------------------- |
+| attachments.created_on | Created |
+| attachments.filename | Format |
+| attachments.description | Description |
+| attachments.author | Author |
+| attachments.filesize | Size |
+| attachments.digest | MD5 digest |
+| attachments.downloads | D/L |
+| attachments.file | Attachment content |
+
+You can search for issues, projects, news, documents, wiki pages and messages by attachments. For example, to limit the search scope to containers with the **somefile.pdf** attachment filename, use the following syntax:
+
+    attachments.filename:somefile.pdf
+
+## Maintainers
+
+Danil Tashkinov, [github.com/nodecarter](https://github.com/nodecarter)
 
 ## License
 
-Elasticsearch is a trademark of Elasticsearch BV, registered in the U.S. and in other countries.
+Copyright (c) 2015 Undev
 
-Copyright (C) 2014 Undev.ru
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+http://www.apache.org/licenses/LICENSE-2.0
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.

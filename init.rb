@@ -5,8 +5,8 @@ ActionDispatch::Callbacks.to_prepare do
 end
 
 Redmine::Plugin.register :redmine_elasticsearch do
-  name        'Full text searching plugin for Redmine'
-  description 'This plugin integrates elasticsearch into Redmine'
+  name        'Redmine Elasticsearch Plugin'
+  description 'This plugin integrates the Elasticsearch full-text search engine into Redmine.'
   author      'Undev'
   version     '0.1.12'
   url         'https://github.com/Undev/redmine_elasticsearch'
