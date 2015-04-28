@@ -211,9 +211,9 @@ You can search for issues, projects, news, documents, wiki pages and messages by
 
     attachments.filename:somefile.pdf
 
-## Links
+## Maintainers
 
-- https://github.com/karmi/retire
+Danil Tashkinov, [github.com/nodecarter](https://github.com/nodecarter)
 
 ## License
 
