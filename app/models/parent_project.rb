@@ -78,7 +78,8 @@ class ParentProject < Project
       unless user.admin?
         statement_by_role = {}
         role = user.logged? ? Role.non_member : Role.anonymous
-        if role.allowed_to?(permission)
+        hide_public_projects = user.pref[:hide_public_projects] == '1'
+        if role.allowed_to?(permission) && !hide_public_projects
           statement_by_role[role] = {
               has_parent: {
                   type: 'parent_project',
