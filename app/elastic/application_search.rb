@@ -37,10 +37,9 @@ module ApplicationSearch
       }
     end
 
-    def nested_attachments_mappings
+    def attachments_mappings
       {
           attachments: {
-              type: 'nested',
               properties: {
                   created_on: { type: 'date', index_name: 'datetime' },
                   filename: { type: 'string', index_name: 'title',

@@ -32,7 +32,7 @@ module DocumentSearch
           type: { type: 'string', index: 'not_analyzed' },
 
           category: { type: 'string' }
-      }.merge(additional_index_mappings).merge(nested_attachments_mappings)
+      }.merge(additional_index_mappings).merge(attachments_mappings)
     end
 
     def allowed_to_search_query(user, options = {})

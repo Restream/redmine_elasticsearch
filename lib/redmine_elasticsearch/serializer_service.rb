@@ -32,11 +32,11 @@ class RedmineElasticsearch::SerializerService
 
     def add_additional_properties(serializer_klass, additional_props)
       additional_props.each do |key, value|
-        nested_props = value[:properties]
-        if nested_props.nil?
+        props = value[:properties]
+        if props.nil?
           add_attribute_to_serializer(serializer_klass, key)
         else
-          add_association_to_serializer(serializer_klass, key, nested_props)
+          add_association_to_serializer(serializer_klass, key, props)
         end
       end
     end
@@ -46,9 +46,9 @@ class RedmineElasticsearch::SerializerService
     end
 
     def add_association_to_serializer(serializer_klass, name, options)
-      nested_serializer_klass = Class.new(BaseSerializer)
-      add_additional_properties(nested_serializer_klass, options)
-      serializer_klass.send :has_many, name, :serializer => nested_serializer_klass
+      props_serializer_klass = Class.new(BaseSerializer)
+      add_additional_properties(props_serializer_klass, options)
+      serializer_klass.send :has_many, name, :serializer => props_serializer_klass
     end
 
   end

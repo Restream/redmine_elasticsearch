@@ -112,31 +112,9 @@ module RedmineElasticsearch::Patches::SearchControllerPatch
 
     common_must = []
 
-    search_fields = options[:titles_only] ? ['title'] : %w(title description notes custom_field_values)
+    search_fields = options[:titles_only] ? ['title'] : %w(title description notes custom_field_values attachments.title attachments.file attachments.filename)
     search_operator = options[:all_words] ? 'AND' : 'OR'
-    main_query = get_main_query(options, search_fields, search_operator)
-
-    unless options[:titles_only]
-      nested_search_fields = %w(attachments.title attachments.file attachments.filename)
-      nested_query = get_main_query(options, nested_search_fields, search_operator)
-
-      # add nested_query for searching in attachments
-      main_query = {
-          bool: {
-              should: [
-                  main_query,
-                  {
-                      nested: {
-                          path: 'attachments',
-                          query: nested_query
-                      }
-                  }
-              ]
-          }
-      }
-    end
-
-    common_must << main_query
+    common_must << get_main_query(options, search_fields, search_operator)
 
     document_types = options[:scope].map(&:singularize)
     common_must << { terms: { _type: document_types} }
@@ -210,29 +188,28 @@ module RedmineElasticsearch::Patches::SearchControllerPatch
   end
 
   def get_main_query(options, search_fields, search_operator)
-    main_query = case options[:search_type]
-                   when :query_string
-                     {
-                         query_string: {
-                             query: options[:q],
-                             default_operator: search_operator,
-                             fields: search_fields,
-                             use_dis_max: true
-                         }
-                     }
-                   when :match
-                     {
-                         multi_match: {
-                             query: options[:q],
-                             operator: search_operator,
-                             fields: search_fields,
-                             use_dis_max: true
-                         }
-                     }
-                   else
-                     raise "Unknown search_type: #{options[:search_type].inspect}"
-                 end
-    main_query
+    case options[:search_type]
+      when :query_string
+        {
+            query_string: {
+                query:            options[:q],
+                default_operator: search_operator,
+                fields:           search_fields,
+                use_dis_max:      true
+            }
+        }
+      when :match
+        {
+            multi_match: {
+                query:       options[:q],
+                operator:    search_operator,
+                fields:      search_fields,
+                use_dis_max: true
+            }
+        }
+      else
+        raise "Unknown search_type: #{options[:search_type].inspect}"
+    end
   end
 
   def get_results_by_type_from_search_results(results)
