@@ -54,7 +54,7 @@ class ParentProject < Project
     end
 
     def searching_scope
-      self.scoped
+      self.where(nil)
     end
 
     def allowed_to_search_query(user, options = {})
