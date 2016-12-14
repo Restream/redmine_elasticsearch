@@ -1,7 +1,7 @@
 # Redmine Elasticsearch Plugin
 
-[![Build Status](https://travis-ci.org/Undev/redmine_elasticsearch.png?branch=master)](https://travis-ci.org/Undev/redmine_elasticsearch)
-[![Code Climate](https://codeclimate.com/github/Undev/redmine_elasticsearch.png)](https://codeclimate.com/github/Undev/redmine_elasticsearch)
+[![Build Status](https://travis-ci.org/Restream/redmine_elasticsearch.svg?branch=master)](https://travis-ci.org/Restream/redmine_elasticsearch)
+[![Code Climate](https://codeclimate.com/github/Restream/redmine_elasticsearch/gpa.svg)](https://codeclimate.com/github/Restream/redmine_elasticsearch)
 
 This plugin integrates the Elasticsearch<sup>®</sup> full-text search engine into Redmine.
 
@@ -9,11 +9,11 @@ Elasticsearch is a trademark of Elasticsearch BV, registered in the U.S. and in 
 
 ## Compatibility
 
-This plugin version is compatible only with Redmine 2.1.x and later.
+This plugin version is compatible only with Redmine 3.x and later.
 
 ## Installation
 
-1. This plugin requires [Redmine Resque Plugin](https://github.com/Undev/redmine_resque). Install the plugin, but do not start a Resque worker for now.
+1. This plugin requires [Redmine Resque Plugin](https://github.com/Restream/redmine_resque). Install the plugin, but do not start a Resque worker for now.
 
 2. Download and install [Elasticsearch](http://www.elasticsearch.org/overview/elkdownloads/).
 
@@ -35,7 +35,7 @@ This plugin version is compatible only with Redmine 2.1.x and later.
             
       Copy the plugin from GitHub using the following commands:
       
-            git clone https://github.com/Undev/redmine_elasticsearch.git plugins/redmine_elasticsearch
+            git clone https://github.com/Restream/redmine_elasticsearch.git plugins/redmine_elasticsearch
 
 5. Install the required gems:
 
@@ -46,7 +46,7 @@ This plugin version is compatible only with Redmine 2.1.x and later.
         cd {REDMINE_ROOT}
         bundle exec rake redmine_elasticsearch:reindex_all RAILS_ENV=production
 
-7. Start a Resque worker (as described in [Redmine Resque Plugin](https://github.com/Undev/redmine_resque) installation instructions).
+7. Start a Resque worker (as described in [Redmine Resque Plugin](https://github.com/Restream/redmine_resque) installation instructions).
 
         cd YOUR_REDMINE_ROOT
         bundle exec rake resque:work RAILS_ENV=production QUEUE=*
@@ -60,8 +60,8 @@ Now you should be able to see the plugin in **Administration > Plugins**.
 By default, only regular fields are indexed. To index custom fields, you should add them to **config/additional_environment.rb**. For example, to enable indexing of issue tags, add the following code:
 
     config.additional_index_properties = {
-        :issues => {
-            :tags => { :type => 'string' }
+        issues:  {
+            tags:  { type:  'string' }
         }
     }
 
@@ -78,7 +78,7 @@ For more information about the query string syntax, see [Elasticsearch Reference
 The search results are counted and displayed according to the current user permissions.
 
 You can search for one word by typing the word or its initial part in the **Search** box. If you type several words, the search results will show pages that contain at least one of these words. To search for all words, enable the **All words** check box. If you want to search for the exact phrase, surround it by double quotes (*"another issue"*).  
-![search options](elasticsearch_1.PNG)
+![search options](doc/elasticsearch_1.png)
 
 By default, search is performed in the following fields:
 
@@ -217,7 +217,7 @@ Danil Tashkinov, [github.com/nodecarter](https://github.com/nodecarter)
 
 ## License
 
-Copyright (c) 2015 Undev
+Copyright (c) 2016 Restream
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

@@ -13,12 +13,12 @@ class RedmineElasticsearch::SerializerService
     private
 
     def serializer_klass(object_type)
-      @serializers ||= {}
+      @serializers              ||= {}
       @serializers[object_type] ||= build_serializer_klass(object_type)
     end
 
     def build_serializer_klass(object_type)
-      parent = "#{RedmineElasticsearch.type2class_name(object_type)}Serializer".safe_constantize || BaseSerializer
+      parent           = "#{RedmineElasticsearch.type2class_name(object_type)}Serializer".safe_constantize || BaseSerializer
       serializer_klass = Class.new(parent)
       additional_props = additional_index_properties(object_type)
       add_additional_properties(serializer_klass, additional_props) if additional_props
@@ -48,7 +48,7 @@ class RedmineElasticsearch::SerializerService
     def add_association_to_serializer(serializer_klass, name, options)
       props_serializer_klass = Class.new(BaseSerializer)
       add_additional_properties(props_serializer_klass, options)
-      serializer_klass.send :has_many, name, :serializer => props_serializer_klass
+      serializer_klass.send :has_many, name, serializer: props_serializer_klass
     end
 
   end

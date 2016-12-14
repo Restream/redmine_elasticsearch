@@ -1,52 +1,52 @@
 <h2><%= l(:label_search) %></h2>
 
 <div class="box">
-  <%= form_tag({}, :method => :get) do %>
-    <%= label_tag "search-input", l(:description_search), :class => "hidden-for-sighted" %>
-    <p><%= text_field_tag 'q', @question, :size => 120, :id => 'search-input' %>
-      <%= javascript_tag "$('#search-input').focus()" %>
-      <%= link_to({ controller: 'elasticsearch', action: 'search_syntax' }, target: '_blank') do %>
-        <%= image_tag 'help.png' %>
-      <% end  %>
-      <%= project_select_tag %>
-      <%= hidden_field_tag 'all_words', '', :id => nil %>
-      <label><%= check_box_tag 'all_words', 1, @all_words %> <%= l(:label_all_words) %></label>
-      <%= hidden_field_tag 'titles_only', '', :id => nil %>
-      <label><%= check_box_tag 'titles_only', 1, @titles_only %> <%= l(:label_search_titles_only) %></label>
-    </p>
-    <p>
-      <% @object_types.each do |t| %>
-        <label><%= check_box_tag t, 1, @scope.include?(t) %> <%= type_label(t) %></label>
-      <% end %>
-    </p>
+  <%= form_tag({}, method: :get) do %>
+      <%= label_tag "search-input", l(:description_search), class: "hidden-for-sighted" %>
+      <p><%= text_field_tag 'q', @question, size: 120, id: 'search-input' %>
+        <%= javascript_tag "$('#search-input').focus()" %>
+        <%= link_to({ controller: 'elasticsearch', action: 'search_syntax' }, target: '_blank') do %>
+            <%= image_tag 'help.png' %>
+        <% end %>
+        <%= project_select_tag %>
+        <%= hidden_field_tag 'all_words', '', id: nil %>
+        <label><%= check_box_tag 'all_words', 1, @all_words %> <%= l(:label_all_words) %></label>
+        <%= hidden_field_tag 'titles_only', '', id: nil %>
+        <label><%= check_box_tag 'titles_only', 1, @titles_only %> <%= l(:label_search_titles_only) %></label>
+      </p>
+      <p>
+        <% @object_types.each do |t| %>
+            <label><%= check_box_tag t, 1, @scope.include?(t) %> <%= type_label(t) %></label>
+        <% end %>
+      </p>
 
-    <p><%= submit_tag l(:button_submit), :name => 'submit' %></p>
+      <p><%= submit_tag l(:button_submit), name: 'submit' %></p>
   <% end %>
   <% if Rails.env == 'development' %>
-    <p>
-      Query took <%= @results.time %> ms, search type: <%= @search_type %>
-    </p>
-    <% @query_curl.each do |query| %>
-      <p><%= query %></p>
-    <% end %>
+      <p>
+        Query took <%= @results.time %> ms, search type: <%= @search_type %>
+      </p>
+      <% @query_curl.each do |query| %>
+          <p><%= query %></p>
+      <% end %>
   <% end %>
 </div>
 
 <% unless @results.empty? %>
-  <div id="search-results-counts">
-    <%= render_results_by_type(@results_by_type) unless @scope.size == 1 %>
-  </div>
+    <div id="search-results-counts">
+      <%= render_results_by_type(@results_by_type) unless @scope.size == 1 %>
+    </div>
 
-  <h3><%= l(:label_result_plural) %> (<%= @results.total_entries %>)</h3>
-  <dl id="search-results">
-    <% @results.each do |e| %>
-      <dt class="<%= e.event_type %>"><%= content_tag('span', h(e.project), :class => 'project') unless @project == e.project %> <%= link_to highlight_tokens(truncate(e.event_title, :length => 255), @tokens), e.event_url %></dt>
-      <dd><span class="description"><%= highlight_tokens(e.event_description, @tokens) %></span>
-        <span class="author"><%= format_time(e.event_datetime) %></span></dd>
-    <% end %>
-  </dl>
+    <h3><%= l(:label_result_plural) %> (<%= @results.total_entries %>)</h3>
+    <dl id="search-results">
+      <% @results.each do |e| %>
+          <dt class="<%= e.event_type %>"><%= content_tag('span', h(e.project), class: 'project') unless @project == e.project %> <%= link_to highlight_tokens(truncate(e.event_title, length: 255), @tokens), e.event_url %></dt>
+          <dd><span class="description"><%= highlight_tokens(e.event_description, @tokens) %></span>
+            <span class="author"><%= format_time(e.event_datetime) %></span></dd>
+      <% end %>
+    </dl>
 
-  <%= paginate @results %>
+    <%= paginate @results %>
 <% end %>
 
 

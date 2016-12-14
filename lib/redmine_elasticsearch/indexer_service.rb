@@ -69,7 +69,7 @@ module RedmineElasticsearch
       end
 
       def create_index
-        index = ParentProject.index
+        index  = ParentProject.index
         result = index.create settings: ParentProject.index_settings, mappings: ParentProject.index_mappings
         raise IndexerError.new("Can't create index: \n#{index.response.try(:body)}\n") unless result
       end

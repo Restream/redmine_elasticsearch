@@ -13,7 +13,7 @@ end
 Tire::Configuration.url(Redmine::Configuration['elasticsearch_url'])
 
 %w{elastic serializers}.each do |fold|
-  fold_path = File.dirname(__FILE__) + "/../app/#{fold}"
+  fold_path                                  = File.dirname(__FILE__) + "/../app/#{fold}"
   ActiveSupport::Dependencies.autoload_paths += [fold_path]
 end
 

@@ -35,6 +35,6 @@ class BaseSerializer < ActiveModel::Serializer
   end
 
   def default_url_options
-    { :host => Setting.host_name, :protocol => Setting.protocol }
+    { host: Setting.host_name, protocol: Setting.protocol }
   end
 end

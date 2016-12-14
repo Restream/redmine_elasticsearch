@@ -14,8 +14,8 @@ module Workers
           self.perform_async(params)
         elsif object_or_class.id?
           params = {
-              id: object_or_class.id,
-              type: object_or_class.class.index_document_type
+            id:   object_or_class.id,
+            type: object_or_class.class.index_document_type
           }
           self.perform_async(params)
         end
@@ -41,7 +41,7 @@ module Workers
       end
 
       def update_instance_index(type, id)
-        klass = RedmineElasticsearch.type2class(type)
+        klass    = RedmineElasticsearch.type2class(type)
         document = klass.find id
         document.update_index
       rescue ActiveRecord::RecordNotFound

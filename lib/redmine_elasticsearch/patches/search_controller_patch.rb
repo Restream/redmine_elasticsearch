@@ -26,32 +26,32 @@ module RedmineElasticsearch::Patches::SearchControllerPatch
       # and it provides an excellent behavior when it comes to just analyze and
       # run that text as a query behavior (which is usually what a text search box does).
       search_options = {
-          :scope => @scope,
-          :q => @question,
-          :titles_only => @titles_only,
-          :all_words => @all_words,
-          :page => params[:page] || 1,
-          :size => RESULT_SIZE,
-          :projects => @projects_to_search
+        scope:       @scope,
+        q:           @question,
+        titles_only: @titles_only,
+        all_words:   @all_words,
+        page:        params[:page] || 1,
+        size:        RESULT_SIZE,
+        projects:    @projects_to_search
       }
       begin
         search_options[:search_type] = :query_string
-        @results = perform_search(search_options)
+        @results                     = perform_search(search_options)
       rescue Tire::Search::SearchRequestFailed => e
         logger.debug e
         search_options[:search_type] = :match
-        @results = perform_search(search_options)
+        @results                     = perform_search(search_options)
       end
-      @search_type = search_options[:search_type]
+      @search_type     = search_options[:search_type]
       @results_by_type = get_results_by_type_from_search_results(@results)
-      render :layout => false if request.xhr?
+      render layout: false if request.xhr?
     end
   rescue Errno::ECONNREFUSED => e
     logger.error e
-    render_error :message => :search_connection_refused, :status => 503
+    render_error message: :search_connection_refused, status: 503
   rescue Tire::Search::SearchRequestFailed => e
     logger.error e
-    render_error :message => :search_request_failed, :status => 503
+    render_error message: :search_request_failed, status: 503
   end
 
   private
@@ -59,17 +59,17 @@ module RedmineElasticsearch::Patches::SearchControllerPatch
   def get_variables_from_params
     @question = params[:q] || ''
     @question.strip!
-    @all_words = params[:all_words] ? params[:all_words].present? : true
-    @titles_only = params[:titles_only] ? params[:titles_only].present? : false
+    @all_words          = params[:all_words] ? params[:all_words].present? : true
+    @titles_only        = params[:titles_only] ? params[:titles_only].present? : false
     @projects_to_search = get_projects_from_params
-    @object_types = allowed_object_types(@projects_to_search)
-    @scope = filter_object_types_from_params(@object_types)
+    @object_types       = allowed_object_types(@projects_to_search)
+    @scope              = filter_object_types_from_params(@object_types)
 
     # extract tokens from the question
     # eg. hello "bye bye" => ["hello", "bye bye"]
-    @tokens = @question.scan(%r{((\s|^)"[\s\w]+"(\s|$)|\S+)}).collect {|m| m.first.gsub(%r{(^\s*"\s*|\s*"\s*$)}, '')}
+    @tokens             = @question.scan(%r{((\s|^)"[\s\w]+"(\s|$)|\S+)}).collect { |m| m.first.gsub(%r{(^\s*"\s*|\s*"\s*$)}, '') }
     # tokens must be at least 2 characters long
-    @tokens = @tokens.uniq.select {|w| w.length > 1 }
+    @tokens             = @tokens.uniq.select { |w| w.length > 1 }
   end
 
   def detect_issue_in_question(question)
@@ -112,77 +112,77 @@ module RedmineElasticsearch::Patches::SearchControllerPatch
 
     common_must = []
 
-    search_fields = options[:titles_only] ? ['title'] : %w(title description notes custom_field_values attachments.title attachments.file attachments.filename)
+    search_fields   = options[:titles_only] ? ['title'] : %w(title description notes custom_field_values attachments.title attachments.file attachments.filename)
     search_operator = options[:all_words] ? 'AND' : 'OR'
     common_must << get_main_query(options, search_fields, search_operator)
 
     document_types = options[:scope].map(&:singularize)
-    common_must << { terms: { _type: document_types} }
+    common_must << { terms: { _type: document_types } }
 
     if project_ids
       common_must << {
-          has_parent: {
-              type: 'parent_project',
-              query: { ids: { values: project_ids } }
-          }
+        has_parent: {
+          type:  'parent_project',
+          query: { ids: { values: project_ids } }
+        }
       }
     end
 
     common_must_not = []
 
     common_must_not << {
-        has_parent: {
-            type: 'parent_project',
-            query: { term: { status_id: { value: Project::STATUS_ARCHIVED } } }
-        }
+      has_parent: {
+        type:  'parent_project',
+        query: { term: { status_id: { value: Project::STATUS_ARCHIVED } } }
+      }
     }
 
     common_should = []
 
     document_types.each do |search_type|
       search_klass = RedmineElasticsearch.type2class(search_type)
-      type_query = search_klass.allowed_to_search_query(User.current)
+      type_query   = search_klass.allowed_to_search_query(User.current)
       common_should << type_query if type_query
     end
 
     payload = {
-        query: {
-            filtered: {
-                query: {
-                    bool: {
-                        must: common_must,
-                        must_not: common_must_not,
-                        should: common_should,
-                        minimum_should_match: 1
-                    }
-                }
+      query:  {
+        filtered: {
+          query: {
+            bool: {
+              must:                 common_must,
+              must_not:             common_must_not,
+              should:               common_should,
+              minimum_should_match: 1
             }
-        },
-        sort: [
-            { datetime: { order: 'desc' } },
-            :_score
-        ],
-        fields: ['_id'],
-        facets: {
-            types: {
-                terms: {
-                    field: '_type',
-                    size: 10,
-                    all_terms: false
-                }
-            }
+          }
         }
+      },
+      sort:   [
+                { datetime: { order: 'desc' } },
+                :_score
+              ],
+      fields: ['_id'],
+      facets: {
+        types: {
+          terms: {
+            field:     '_type',
+            size:      10,
+            all_terms: false
+          }
+        }
+      }
     }
 
     search_options = {
-        page: options[:page].to_i,
-        size: options[:size].to_i,
-        from: (options[:page].to_i - 1) * options[:size].to_i,
-        load: true,
-        payload: payload
+      page:    options[:page].to_i,
+      size:    options[:size].to_i,
+      from:    (options[:page].to_i - 1) * options[:size].to_i,
+      load:    true,
+      payload: payload
     }
-    search = Tire.search RedmineElasticsearch::INDEX_NAME, search_options
-    @query_curl ||= []
+    search         = Tire.search RedmineElasticsearch::INDEX_NAME, search_options
+    @query_curl    ||= []
     @query_curl << search.to_curl
     search.results
   end
@@ -191,21 +191,21 @@ module RedmineElasticsearch::Patches::SearchControllerPatch
     case options[:search_type]
       when :query_string
         {
-            query_string: {
-                query:            options[:q],
-                default_operator: search_operator,
-                fields:           search_fields,
-                use_dis_max:      true
-            }
+          query_string: {
+            query:            options[:q],
+            default_operator: search_operator,
+            fields:           search_fields,
+            use_dis_max:      true
+          }
         }
       when :match
         {
-            multi_match: {
-                query:       options[:q],
-                operator:    search_operator,
-                fields:      search_fields,
-                use_dis_max: true
-            }
+          multi_match: {
+            query:       options[:q],
+            operator:    search_operator,
+            fields:      search_fields,
+            use_dis_max: true
+          }
         }
       else
         raise "Unknown search_type: #{options[:search_type].inspect}"

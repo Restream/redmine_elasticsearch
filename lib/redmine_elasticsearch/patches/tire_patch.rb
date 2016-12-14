@@ -11,16 +11,16 @@ module RedmineElasticsearch::Patches::TirePatch
 
     records = {}
     @response['hits']['hits'].group_by { |item| item['_type'] }.each do |type, items|
-      raise NoMethodError, "You have tried to eager load the model instances, " +
-          "but Tire cannot find the model class because " +
-          "document has no _type property." unless type
+      raise NoMethodError, 'You have tried to eager load the model instances, ' +
+        'but Tire cannot find the model class because ' +
+        'document has no _type property.' unless type
 
       begin
         klass = type.camelize.constantize
       rescue NameError => e
-        raise NameError, "You have tried to eager load the model instances, but " +
-            "Tire cannot find the model class '#{type.camelize}' " +
-            "based on _type '#{type}'.", e.backtrace
+        raise NameError, 'You have tried to eager load the model instances, but ' +
+          "Tire cannot find the model class '#{type.camelize}' " +
+          "based on _type '#{type}'.", e.backtrace
       end
 
       records[type] = Array(__find_records_by_ids klass, items.map { |h| h['_id'] })

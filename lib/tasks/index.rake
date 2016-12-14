@@ -13,7 +13,7 @@ namespace :redmine_elasticsearch do
   task :reindex_all => :logged do
     puts 'Recreate index for all available search types'
     estimated_records = RedmineElasticsearch::IndexerService.count_estimated_records
-    bar = ANSI::ProgressBar.new('Projects', estimated_records)
+    bar               = ANSI::ProgressBar.new('Projects', estimated_records)
     bar.flush
     RedmineElasticsearch::IndexerService.reindex_all(batch_size: batch_size) do |records|
       bar.inc(records)
@@ -28,7 +28,7 @@ namespace :redmine_elasticsearch do
     raise 'Specify search type in NAME env variable' if search_type.blank?
     puts "Reindexing #{search_type} type"
     estimated_records = RedmineElasticsearch::IndexerService.count_estimated_records(search_type)
-    bar = ANSI::ProgressBar.new("#{search_type}", estimated_records)
+    bar               = ANSI::ProgressBar.new("#{search_type}", estimated_records)
     bar.flush
     RedmineElasticsearch::IndexerService.reindex(search_type, batch_size: batch_size) do |records|
       bar.inc(records)
@@ -38,8 +38,8 @@ namespace :redmine_elasticsearch do
   end
 
   task :logged => :environment do
-    logger = Logger.new(STDOUT)
-    logger.level = Logger::WARN
+    logger                    = Logger.new(STDOUT)
+    logger.level              = Logger::WARN
     ActiveRecord::Base.logger = logger
   end
 

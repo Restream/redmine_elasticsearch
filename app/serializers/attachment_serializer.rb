@@ -3,7 +3,7 @@ class AttachmentSerializer < ActiveModel::Serializer
 
   # todo: move max_size and supported_mime_patterns and unsupported phrase to plugin configuration
 
-  MAX_SIZE = 5.megabytes
+  MAX_SIZE  = 5.megabytes
 
   SUPPORTED_EXTENSIONS = %w{
     .doc .docx .htm .html .json .ods .odt .pdf .ppt .pptx .rb .rtf .sh .sql .txt .xls .xlsx .xml .yaml .yml
@@ -57,9 +57,9 @@ class AttachmentSerializer < ActiveModel::Serializer
 
   def supported?
     object.filesize > 0 &&
-        object.filesize < MAX_SIZE &&
-        (extension_supported? || content_type_supported?) &&
-        object.readable?
+      object.filesize < MAX_SIZE &&
+      (extension_supported? || content_type_supported?) &&
+      object.readable?
   end
 
   def extension_supported?

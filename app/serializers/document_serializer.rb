@@ -4,7 +4,7 @@ class DocumentSerializer < BaseSerializer
              :created_on,
              :category
 
-  has_many :attachments, :serializer => AttachmentSerializer
+  has_many :attachments, serializer: AttachmentSerializer
 
   def category
     object.category.try(:name)

@@ -25,17 +25,17 @@ class RedmineElasticsearch::SearchControllerTest < ActionController::TestCase
   end
 
   def test_index_success_with_user
-    @user = User.find(2)
-    User.current = @user
+    @user                      = User.find(2)
+    User.current               = @user
     @request.session[:user_id] = 2
-    get :index, :q => '*'
+    get :index, q: '*'
     assert_response :success
   end
 
   def test_index_success_with_anonymous
-    User.current = nil
+    User.current               = nil
     @request.session[:user_id] = nil
-    get :index, :q => '*'
+    get :index, q: '*'
     assert_response :success
   end
 end

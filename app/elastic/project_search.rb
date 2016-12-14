@@ -10,44 +10,44 @@ module ProjectSearch
 
     def index_mappings
       {
-          project: {
-              _parent: { type: 'parent_project' },
-              _routing: { required: true, path: 'route_key' },
-              properties: project_mappings_hash
-          }
+        project: {
+          _parent:    { type: 'parent_project' },
+          _routing:   { required: true, path: 'route_key' },
+          properties: project_mappings_hash
+        }
       }
     end
 
     def project_mappings_hash
       {
-          id: { type: 'integer', index_name: 'project_id', not_analyzed: true },
-          route_key: { type: 'string', not_analyzed: true },
+        id:                  { type: 'integer', index_name: 'project_id', not_analyzed: true },
+        route_key:           { type: 'string', not_analyzed: true },
 
-          # acts_as_event fields
-          created_on: { type: 'date', index_name: 'datetime' },
-          name: { type: 'string',
-                  index_name: 'title',
-                  search_analyzer: 'search_analyzer',
-                  index_analyzer: 'index_analyzer' },
-          description: { type: 'string',
-                         search_analyzer: 'search_analyzer',
-                         index_analyzer: 'index_analyzer' },
-          author: { type: 'string' },
-          url: { type: 'string', index: 'not_analyzed' },
-          type: { type: 'string', index: 'not_analyzed' },
+        # acts_as_event fields
+        created_on:          { type: 'date', index_name: 'datetime' },
+        name:                { type:            'string',
+                               index_name:      'title',
+                               search_analyzer: 'search_analyzer',
+                               index_analyzer:  'index_analyzer' },
+        description:         { type:            'string',
+                               search_analyzer: 'search_analyzer',
+                               index_analyzer:  'index_analyzer' },
+        author:              { type: 'string' },
+        url:                 { type: 'string', index: 'not_analyzed' },
+        type:                { type: 'string', index: 'not_analyzed' },
 
-          homepage: { type: 'string' },
-          identifier: { type: 'string' },
-          updated_on: { type: 'date' },
-          custom_field_values: { type: 'string', index_name: 'cfv' },
-          is_public: { type: 'boolean' }
+        homepage:            { type: 'string' },
+        identifier:          { type: 'string' },
+        updated_on:          { type: 'date' },
+        custom_field_values: { type: 'string', index_name: 'cfv' },
+        is_public:           { type: 'boolean' }
       }.merge(additional_index_mappings).merge(attachments_mappings)
     end
 
     def allowed_to_search_query(user, options = {})
       options = options.merge(
-          permission: :view_project,
-          type: 'project'
+        permission: :view_project,
+        type:       'project'
       )
       ParentProject.allowed_to_search_query(user, options)
     end
