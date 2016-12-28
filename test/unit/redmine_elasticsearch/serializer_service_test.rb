@@ -48,4 +48,10 @@ class RedmineElasticsearch::SerializerServiceTest < ActiveSupport::TestCase
     assert_equal serializer1.class, serializer2.class
   end
 
+  def test_create_serializer_with_custom_klass
+    object      = Project.new
+    serializer = RedmineElasticsearch::SerializerService.serializer(object, ParentProjectSerializer)
+    assert_kind_of ParentProjectSerializer, serializer
+  end
+
 end
