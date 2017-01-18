@@ -1,7 +1,7 @@
 # Redmine Elasticsearch Plugin
 
 [![Build Status](https://travis-ci.org/Restream/redmine_elasticsearch.svg?branch=master)](https://travis-ci.org/Restream/redmine_elasticsearch)
-[![Code Climate](https://codeclimate.com/github/Restream/redmine_elasticsearch/gpa.svg)](https://codeclimate.com/github/Restream/redmine_elasticsearch)
+[![Code Climate](https://codeclimate.com/github/Restream/redmine_elasticsearch/badges/gpa.svg)](https://codeclimate.com/github/Restream/redmine_elasticsearch)
 
 This plugin integrates the Elasticsearch<sup>®</sup> full-text search engine into Redmine.
 
