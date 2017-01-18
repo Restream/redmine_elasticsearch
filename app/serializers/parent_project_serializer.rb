@@ -4,11 +4,7 @@ class ParentProjectSerializer < ActiveModel::Serializer
   attributes :id,
              :is_public,
              :status_id,
-             :enabled_module_names, :route_key
-
-  def route_key
-    RedmineElasticsearch::IndexerService::ROUTE_KEY
-  end
+             :enabled_module_names
 
   def status_id
     object.status

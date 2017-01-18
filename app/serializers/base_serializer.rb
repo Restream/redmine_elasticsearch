@@ -1,19 +1,10 @@
 class BaseSerializer < ActiveModel::Serializer
   self.root = false
 
-  attributes :id, :_parent, :_routing, :route_key,
-             :datetime, :title, :description, :author, :url, :type
-
-  def route_key
-    RedmineElasticsearch::IndexerService::ROUTE_KEY
-  end
+  attributes :id, :_parent, :datetime, :title, :description, :author, :url, :type
 
   def _parent
-    object.project_id if object.respond_to? :project_id
-  end
-
-  def _routing
-    route_key
+    project_id if respond_to? :project_id
   end
 
   %w(datetime title description).each do |attr|
@@ -21,7 +12,7 @@ class BaseSerializer < ActiveModel::Serializer
   end
 
   def type
-    object.class.index_document_type
+    object.class.document_type
   end
 
   def author

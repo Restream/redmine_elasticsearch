@@ -2,7 +2,7 @@ module ApplicationSearch
   extend ActiveSupport::Concern
 
   included do
-    include Tire::Model::Search
+    include Elasticsearch::Model
 
     index_name RedmineElasticsearch::INDEX_NAME
 
@@ -19,61 +19,10 @@ module ApplicationSearch
 
   module ClassMethods
 
-    def index_document_type
-      self.name.underscore
-    end
-
-    def index_mappings
+    def index_mapping
       {
         document_type => {
-          _parent:    { type: 'parent_project' },
-          _routing:   { required: true, path: 'route_key' },
-          properties: {
-                        id:         { type: 'integer' },
-                        project_id: { type: 'integer', index: 'not_analyzed' },
-                        route_key:  { type: 'string', not_analyzed: true },
-                      }.merge(additional_index_mappings)
-        }
-      }
-    end
-
-    def attachments_mappings
-      {
-        attachments: {
-          properties: {
-            created_on:  { type: 'date', index_name: 'datetime' },
-            filename:    { type:            'string', index_name: 'title',
-                           search_analyzer: 'search_analyzer',
-                           index_analyzer:  'index_analyzer' },
-            description: { type:            'string',
-                           search_analyzer: 'search_analyzer',
-                           index_analyzer:  'index_analyzer' },
-            author:      { type: 'string' },
-
-            filesize:    { type: 'integer', index: 'not_analyzed' },
-            digest:      { type: 'string', index: 'not_analyzed' },
-            downloads:   { type: 'integer', index: 'not_analyzed' },
-            author_id:   { type: 'integer', index: 'not_analyzed' },
-
-            file:        {
-              type:   'attachment',
-              fields: {
-                file:           { store:           'no',
-                                  search_analyzer: 'search_analyzer',
-                                  index_analyzer:  'index_analyzer' },
-                title:          { store:           'no',
-                                  search_analyzer: 'search_analyzer',
-                                  index_analyzer:  'index_analyzer' },
-                date:           { store: 'no' },
-                author:         { store: 'no' },
-                keywords:       { search_analyzer: 'search_analyzer',
-                                  index_analyzer:  'index_analyzer' },
-                content_type:   { store: 'no' },
-                content_length: { store: 'no' },
-                language:       { store: 'no' }
-              }
-            }
-          }
+          _parent: { type: 'parent_project' }
         }
       }
     end
@@ -83,11 +32,13 @@ module ApplicationSearch
       Rails.configuration.additional_index_properties[self.name.tableize.to_sym] || {}
     end
 
+    # Update mapping for document type
     def update_mapping
-      index.refresh
-      index_mappings.each do |k, v|
-        index.mapping! k, v
-      end
+      __elasticsearch__.client.indices.put_mapping(
+        index: index_name,
+        type:  document_type,
+        body:  index_mapping
+      )
     end
 
     def allowed_to_search_query(user, options = {})
@@ -101,6 +52,47 @@ module ApplicationSearch
     def searching_scope(project_id)
       self.where('project_id = ?', project_id)
     end
+
+    # Import all records to elastic
+    # @return [Integer] errors count
+    def import(options = {}, &block)
+      # Batch size for bulk operations
+      batch_size = options.fetch(:batch_size, RedmineElasticsearch::BATCH_SIZE_FOR_IMPORT)
+
+      # Document type
+      type       = options.fetch(:type, document_type)
+
+      # Imported records counter
+      imported   = 0
+
+      # Errors counter
+      errors     = 0
+
+      find_in_batches(batch_size: batch_size) do |items|
+        response = __elasticsearch__.client.bulk(
+          index: index_name,
+          type:  type,
+          body:  items.map do |item|
+            data   = item.to_indexed_json
+            parent = data.delete :_parent
+            { index: { _id: item.id, _parent: parent, data: data } }
+          end
+        )
+        imported += items.length
+        errors   += response['items'].map { |k, v| k.values.first['error'] }.compact.length
+
+        # Call block with imported records count in batch
+        yield(imported) if block_given?
+      end
+      errors
+    end
+
+    def remove_from_index(id)
+      __elasticsearch__.client.delete index: index_name, type: document_type, id: id
+    end
   end
 
+  def update_index
+    self.class.where(id: self.id).import
+  end
 end

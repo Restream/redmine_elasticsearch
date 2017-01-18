@@ -1,56 +1,37 @@
-#encoding: utf-8
-
+# Parent project used for index and query issues, news, projects and etc with parent.
 class ParentProject < Project
   index_name RedmineElasticsearch::INDEX_NAME
 
   class << self
-    def index_settings
-      {
-        analysis: {
-          analyzer: {
-            index_analyzer:  {
-              type:      'custom',
-              tokenizer: 'standard',
-              filter:    %w(lowercase main_ngrams russian_morphology english_morphology main_stopwords)
-            },
-            search_analyzer: {
-              type:      'custom',
-              tokenizer: 'standard',
-              filter:    %w(lowercase russian_morphology english_morphology main_stopwords)
-            }
-          },
-          filter:   {
-            main_stopwords: {
-              type:      'stop',
-              stopwords: %(а без более бы был была были было быть в вам вас весь во вот все всего всех вы где да даже для до его ее если есть еще же за здесь и из или им их к как ко когда кто ли либо мне может мы на надо наш не него нее нет ни них но ну о об однако он она они оно от очень по под при с со так также такой там те тем то того тоже той только том ты у уже хотя чего чей чем что чтобы чье чья эта эти это я a an and are as at be but by for if in into is it no not of on or such that the their then there these they this to was will with)
-            },
-            main_ngrams:    {
-              type:     'edgeNGram',
-              min_gram: 1,
-              max_gram: 20
-            }
-          }
-        }
-      }
-    end
 
-    def index_mappings
-      {
-        parent_project: {
-          _routing:   { required: true, path: 'route_key' },
-          properties: parent_project_mappings_hash
-        }
-      }
-    end
+    # Import all projects to 'parent_project' document type.
+    # 'parent_project' is a project tree for all other items.
+    def import(options={}, &block)
+      # Batch size for bulk operations
+      batch_size = options.fetch(:batch_size, RedmineElasticsearch::BATCH_SIZE_FOR_IMPORT)
 
-    def parent_project_mappings_hash
-      {
-        id:                   { type: 'integer', index_name: 'project_id', not_analyzed: true },
-        is_public:            { type: 'boolean' },
-        status_id:            { type: 'integer', not_analyzed: true },
-        enabled_module_names: { type: 'string', not_analyzed: true },
-        route_key:            { type: 'string', not_analyzed: true }
-      }
+      # Imported records counter
+      imported   = 0
+
+      # Errors counter
+      errors     = 0
+
+      find_in_batches(batch_size: batch_size) do |items|
+        response = __elasticsearch__.client.bulk(
+          index: index_name,
+          type:  document_type,
+          body:  items.map do |item|
+            data = item.to_indexed_json
+            { index: { _id: item.id, data: data } }
+          end
+        )
+        imported += items.length
+        errors   += response['items'].map { |k, v| k.values.first['error'] }.compact.length
+
+        # Call block with imported records count in batch
+        yield(imported) if block_given?
+      end
+      errors
     end
 
     def searching_scope
@@ -67,8 +48,12 @@ class ParentProject < Project
       if perm && perm.project_module
         must_queries << {
           has_parent: {
-            type:  'parent_project',
-            query: { term: { enabled_module_names: { value: perm.project_module } } }
+            parent_type: 'parent_project',
+            query:       {
+              term: {
+                'enabled_module_names.keyword' => { value: perm.project_module }
+              }
+            }
           }
         }
       end
@@ -82,8 +67,8 @@ class ParentProject < Project
         if role.allowed_to?(permission) && !hide_public_projects
           statement_by_role[role] = {
             has_parent: {
-              type:  'parent_project',
-              query: { term: { is_public: { value: true } } }
+              parent_type: 'parent_project',
+              query:       { term: { is_public: { value: true } } }
             }
           }
         end
@@ -92,8 +77,8 @@ class ParentProject < Project
             if role.allowed_to?(permission) && projects.any?
               statement_by_role[role] = {
                 has_parent: {
-                  type:  'parent_project',
-                  query: { ids: { values: projects.collect(&:id) } }
+                  parent_type: 'parent_project',
+                  query:       { ids: { values: projects.collect(&:id) } }
                 }
               }
             end

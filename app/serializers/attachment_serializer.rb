@@ -34,15 +34,15 @@ class AttachmentSerializer < ActiveModel::Serializer
   UNSUPPORTED = 'unsupported'
 
   attributes :created_on,
-             :filename,
-             :description,
-             :author,
-             :filesize,
-             :digest,
-             :downloads,
-             :author_id,
-             :content_type,
-             :file
+    :filename,
+    :description,
+    :author,
+    :filesize,
+    :digest,
+    :downloads,
+    :author_id,
+    :content_type,
+    :file
 
   def author
     object.author && object.author.to_s

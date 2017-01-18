@@ -9,10 +9,6 @@ class WikiPageSerializer < BaseSerializer
     object.wiki.try(:project_id)
   end
 
-  def _parent
-    object.wiki.try(:project_id)
-  end
-
   def author
     nil
   end

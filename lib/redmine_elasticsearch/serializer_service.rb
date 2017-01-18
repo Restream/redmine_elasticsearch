@@ -15,19 +15,10 @@ class RedmineElasticsearch::SerializerService
     #
     def serializer(object, serializer_klass = nil)
       object_type = object.class.name.tableize.to_sym
-      get_serializer_klass(object_type, serializer_klass).new(object)
+      build_serializer_klass(object_type, serializer_klass).new(object)
     end
 
     private
-
-    # Get serializer for specific document type
-    # @param [String] object_type document type
-    # @param [Class] serializer_klass class that will be used to construct serializer
-    #
-    def get_serializer_klass(object_type, serializer_klass = nil)
-      @serializers              ||= {}
-      @serializers[object_type] ||= build_serializer_klass(object_type, serializer_klass)
-    end
 
     # Build serializer. Construct new class and add properties from additional config
     # @param [String] object_type document type
@@ -56,8 +47,7 @@ class RedmineElasticsearch::SerializerService
     # }
     #
     def additional_index_properties(object_type)
-      return nil unless Rails.configuration.respond_to?(:additional_index_properties)
-      Rails.configuration.additional_index_properties[object_type]
+      RedmineElasticsearch::additional_index_properties(object_type)
     end
 
     # Add additional properties to serializer
