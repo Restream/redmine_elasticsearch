@@ -22,14 +22,15 @@ module RedmineElasticsearch
         # and it provides an excellent behavior when it comes to just analyze and
         # run that text as a query behavior (which is usually what a text search box does).
         search_options = {
-          scope:       @scope,
-          q:           @question,
-          titles_only: @titles_only,
-          all_words:   @all_words,
-          page:        @page,
-          size:        @limit,
-          from:        @offset,
-          projects:    @projects_to_search
+          scope:              @scope,
+          q:                  @question,
+          titles_only:        @titles_only,
+          search_attachments: @search_attachments,
+          all_words:          @all_words,
+          page:               @page,
+          size:               @limit,
+          from:               @offset,
+          projects:           @projects_to_search
         }
         begin
           search_options[:search_type] = :query_string
@@ -68,6 +69,7 @@ module RedmineElasticsearch
         @projects_to_search = get_projects_from_params
         @object_types       = allowed_object_types(@projects_to_search)
         @scope              = filter_object_types_from_params(@object_types)
+        @search_attachments = params[:attachments].presence || '0'
         @open_issues        = params[:open_issues] ? params[:open_issues].present? : false
 
         @page = [params[:page].to_i, 1].max
@@ -127,7 +129,10 @@ module RedmineElasticsearch
 
         common_must = []
 
-        search_fields   = options[:titles_only] ? ['title'] : %w(title description journals.notes custom_field_values attachments.title attachments.file attachments.filename)
+        search_fields   = get_search_fields(
+          titles_only: options[:titles_only],
+          search_attachments: options[:search_attachments]
+        )
         search_operator = options[:all_words] ? 'AND' : 'OR'
         common_must << get_main_query(options, search_fields, search_operator)
 
@@ -193,6 +198,26 @@ module RedmineElasticsearch
         search      = Elasticsearch::Model.search search_options, [], index: RedmineElasticsearch::INDEX_NAME
         @query_curl ||= []
         search.results
+      end
+
+      # Get list of searchable fields regardles of searching options: 'titles_only', 'search_attachments'
+      def get_search_fields(titles_only:, search_attachments:)
+        search_fields = titles_only ?
+          %w(title) :
+          %w(title description journals.notes custom_field_values)
+
+        search_attachment_fields = titles_only ?
+          %w(attachments.title) :
+          %w(attachments.title attachments.file attachments.filename attachments.description)
+
+        case search_attachments
+          when '1'
+            search_fields + search_attachment_fields
+          when 'only'
+            search_attachment_fields
+          else
+            search_fields
+        end
       end
 
       def get_main_query(options, search_fields, search_operator)
