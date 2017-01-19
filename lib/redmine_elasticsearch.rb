@@ -36,7 +36,7 @@ module RedmineElasticsearch
   end
 
   def client
-    @client ||= Elasticsearch::Client.new Redmine::Configuration['elasticsearch']
+    @client ||= Elasticsearch::Client.new Redmine::Configuration['elasticsearch'] || { request_timeout: 180 }
   end
 
   # Refresh the index and to make the changes (creates, updates, deletes) searchable.
