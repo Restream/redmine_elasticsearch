@@ -38,7 +38,7 @@ module RedmineElasticsearch
   def client
     # TODO: get url from config: Redmine::Configuration['elasticsearch_url'] or plugin settings
     @client ||= begin
-      options = { request_timeout: 180 }
+      options = { log: true, request_timeout: 180 }
       if Rails.env == 'test'
         options.merge!(
           log:  false,

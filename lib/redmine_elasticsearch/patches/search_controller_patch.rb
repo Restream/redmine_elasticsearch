@@ -68,6 +68,7 @@ module RedmineElasticsearch
         @projects_to_search = get_projects_from_params
         @object_types       = allowed_object_types(@projects_to_search)
         @scope              = filter_object_types_from_params(@object_types)
+        @open_issues        = params[:open_issues] ? params[:open_issues].present? : false
 
         @page = [params[:page].to_i, 1].max
         case params[:format]
@@ -150,6 +151,9 @@ module RedmineElasticsearch
             query:       { term: { status_id: { value: Project::STATUS_ARCHIVED } } }
           }
         }
+
+        # Search only open issues if such option is selected
+        common_must_not << { term: { is_closed: { value: true } } } if @open_issues
 
         common_should = []
 
