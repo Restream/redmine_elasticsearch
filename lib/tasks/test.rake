@@ -4,21 +4,15 @@ namespace :redmine_elasticsearch do
   desc 'Starting ES test cluster'
   task :start_test_cluster do
     if ENV['START_TEST_CLUSTER']
-      cluster_options = {
-        port:            RedmineElasticsearch::TEST_PORT,
-        number_of_nodes: 1,
-        timeout:         120,
-        clear_cluster:   true
-      }
 
-      if Elasticsearch::Extensions::Test::Cluster.running? cluster_options
+      if Elasticsearch::Extensions::Test::Cluster.running? RedmineElasticsearch.client_options
         puts 'Stopping elasticsearch test cluster'
-        Elasticsearch::Extensions::Test::Cluster.stop(port: RedmineElasticsearch::TEST_PORT)
+        Elasticsearch::Extensions::Test::Cluster.stop(RedmineElasticsearch.client_options)
       end
 
       puts 'Running the elasticsearch test cluster...'
       # Use TEST_CLUSTER_COMMAND to setup elasticsearch run command
-      Elasticsearch::Extensions::Test::Cluster.start cluster_options
+      Elasticsearch::Extensions::Test::Cluster.start RedmineElasticsearch.client_options
 
       # Stop test cluster after test
       Rake::Task['redmine:plugins:test:integration'].enhance do
@@ -30,7 +24,7 @@ namespace :redmine_elasticsearch do
   desc 'Stopping ES test cluster'
   task :stop_test_cluster do
     puts 'Stopping elasticsearch test cluster'
-    Elasticsearch::Extensions::Test::Cluster.stop(port: RedmineElasticsearch::TEST_PORT)
+    Elasticsearch::Extensions::Test::Cluster.stop(RedmineElasticsearch.client_options)
   end
 end
 

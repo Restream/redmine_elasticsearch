@@ -3,7 +3,6 @@ require 'elasticsearch/model'
 
 module RedmineElasticsearch
   INDEX_NAME            = "#{Rails.application.class.parent_name.downcase}_#{Rails.env}"
-  TEST_PORT             = 9250
   BATCH_SIZE_FOR_IMPORT = 300
 
   def type2class_name(type)
@@ -36,7 +35,12 @@ module RedmineElasticsearch
   end
 
   def client
-    @client ||= Elasticsearch::Client.new Redmine::Configuration['elasticsearch'] || { request_timeout: 180 }
+    @client ||= Elasticsearch::Client.new client_options
+  end
+
+  def client_options
+    @client_options ||=
+      (Redmine::Configuration['elasticsearch'] || { request_timeout: 180 }).symbolize_keys
   end
 
   # Refresh the index and to make the changes (creates, updates, deletes) searchable.
