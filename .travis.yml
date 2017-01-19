@@ -21,7 +21,8 @@ before_install:
   - sudo dpkg -i --force-confnew elasticsearch-5.1.2.deb
   - sudo $ES_HOME/bin/elasticsearch-plugin install http://dl.bintray.com/content/imotov/elasticsearch-plugins/org/elasticsearch/elasticsearch-analysis-morphology/5.1.2/elasticsearch-analysis-morphology-5.1.2.zip
   - yes | sudo $ES_HOME/bin/elasticsearch-plugin install ingest-attachment
-  - sleep 3
+  - sudo service elasticsearch start
+  - sleep 5
   - export PLUGIN_NAME=redmine_elasticsearch
   - export REDMINE_PATH=$HOME/redmine
   - svn co http://svn.redmine.org/redmine/tags/$REDMINE_VER $REDMINE_PATH

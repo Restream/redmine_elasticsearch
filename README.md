@@ -10,6 +10,8 @@ Elasticsearch is a trademark of Elasticsearch BV, registered in the U.S. and in 
 ## Compatibility
 
 This plugin version is compatible only with Redmine 3.x and later.
+All tests are performed with Elasticsearch 5 version. 
+Work with other versions of Elasticsearch is possible but not guarantied.
 
 ## Installation
 
@@ -65,7 +67,16 @@ By default, only regular fields are indexed. To index custom fields, you should 
         }
     }
 
-You can explicitly specify the elasticsearch cluster by setting the **ELASTICSEARCH_URL** environment variable.
+For change connection options just add some to config/configuration.yml. Here an example:
+
+    default:
+      elasticsearch:
+        log: true
+        request_timeout: 180
+        host: '127.0.0.1'
+        port: 9200
+
+[Full list of available options.](https://github.com/elastic/elasticsearch-ruby/blob/master/elasticsearch-transport/lib/elasticsearch/transport/client.rb#L34)
 
 ## Usage
 
@@ -84,6 +95,7 @@ By default, search is performed in the following fields:
 
 * Subject or Title
 * Description
+* Custom fields values
 * Notes (only for issues)
 
 If you enable the **Search titles only** check box, search will be performed only in the **Subject** / **Title** field.
@@ -210,6 +222,10 @@ For example this query will search issues with done_ratio from 0 to 50 and due_d
 You can search for issues, projects, news, documents, wiki pages and messages by attachments. For example, to limit the search scope to containers with the **somefile.pdf** attachment filename, use the following syntax:
 
     attachments.filename:somefile.pdf
+
+## Testing
+
+    bundle exec rake redmine:plugins:test RAILS_ENV=test NAME=redmine_elasticsearch START_TEST_CLUSTER=true TEST_CLUSTER_COMMAND={PATH_TO_ELASTICSEARCH}
 
 ## Maintainers
 

@@ -36,18 +36,7 @@ module RedmineElasticsearch
   end
 
   def client
-    # TODO: get url from config: Redmine::Configuration['elasticsearch_url'] or plugin settings
-    @client ||= begin
-      options = { log: true, request_timeout: 180 }
-      if Rails.env == 'test'
-        options.merge!(
-          log:  false,
-          host: 'localhost',
-          port: TEST_PORT
-        )
-      end
-      Elasticsearch::Client.new options
-    end
+    @client ||= Elasticsearch::Client.new Redmine::Configuration['elasticsearch']
   end
 
   # Refresh the index and to make the changes (creates, updates, deletes) searchable.
