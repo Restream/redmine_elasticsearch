@@ -12,6 +12,10 @@ class MessageSerializer < BaseSerializer
     object.board.try(:project_id)
   end
 
+  def _parent
+    project_id
+  end
+
   def author
     object.author.try(:name)
   end
