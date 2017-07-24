@@ -4,6 +4,7 @@ require 'elasticsearch/model'
 module RedmineElasticsearch
   INDEX_NAME            = "#{Rails.application.class.parent_name.downcase}_#{Rails.env}"
   BATCH_SIZE_FOR_IMPORT = 300
+  MAXIMUM_BULK_OPERATIONS = 100
 
   def type2class_name(type)
     type.to_s.underscore.classify
@@ -34,8 +35,12 @@ module RedmineElasticsearch
     end
   end
 
-  def client
-    @client ||= Elasticsearch::Client.new client_options
+  def client(cache: true)
+    if cache
+      @client ||= Elasticsearch::Client.new client_options
+    else
+      @client = Elasticsearch::Client.new client_options
+    end
   end
 
   def client_options
