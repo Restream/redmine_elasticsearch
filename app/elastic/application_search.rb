@@ -65,17 +65,10 @@ module ApplicationSearch
       # Imported records counter
       imported = 0
 
-      # Trying to resolve bug when no more than 65k rows can be imported
-      import_operations = 0
-
       # Errors counter
       errors = 0
 
       find_in_batches(batch_size: batch_size) do |items|
-        # Recreate client each N operations
-        if import_operations % RedmineElasticsearch::MAXIMUM_BULK_OPERATIONS == 0
-          __elasticsearch__.client = RedmineElasticsearch.client(cache: false)
-        end
         response = __elasticsearch__.client.bulk(
           index: index_name,
           type:  type,
@@ -86,7 +79,6 @@ module ApplicationSearch
           end
         )
         imported += items.length
-        import_operations += 1
         errors   += response['items'].map { |k, v| k.values.first['error'] }.compact.length
 
         # Call block with imported records count in batch
